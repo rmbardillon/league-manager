@@ -204,7 +204,7 @@ erDiagram
 type StatisticType = 'Points' | 'Assists' | 'Rebounds' | 'Steals' | 'Blocks' | 'Three_Pointers_Made';
 type TournamentFormat = 'single-elimination' | 'double-elimination' | 'round-robin';
 type PlayoffRoundType = 'Quarterfinals' | 'Semifinals' | 'Finals';
-type BestOfN = 3 | 5 | 7;
+type BestOfN = 1 | 3 | 5 | 7;
 type GameStatus = 'scheduled' | 'completed' | 'cancelled';
 type ScheduleState = 'draft' | 'official';
 
@@ -299,7 +299,7 @@ interface Series {
   playoffRoundId: string;
   teamAId: string;
   teamBId: string;
-  bestOf: BestOfN;            // 3, 5, o 7
+  bestOf: BestOfN;            // 1, 3, 5, o 7
 }
 
 interface StandingRow {
@@ -472,7 +472,7 @@ Ang mga property na ito ay galing sa acceptance criteria at pinagsama-sama pagka
 
 ### Property 22: Series best-of-N validation and majority winner
 
-*For any* Series, creation SHALL succeed only when the best-of-N value is 3, 5, or 7; and for any sequence of per-Game winners in a Series of N Games, the Series winner SHALL be the Team that first accumulates more than N/2 Game wins, with no winner declared before that majority is reached.
+*For any* Series, creation SHALL succeed only when the best-of-N value is 1, 3, 5, or 7; and for any sequence of per-Game winners in a Series of N Games, the Series winner SHALL be the Team that first accumulates more than N/2 Game wins, with no winner declared before that majority is reached.
 
 **Validates: Requirements 9.10, 9.11, 9.12**
 

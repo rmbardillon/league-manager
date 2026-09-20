@@ -87,7 +87,7 @@ Bawat property test ay tumatakbo ng minimum 100 iterations at tinatatakan ng:
 
 - [ ] 7. Pure domain: Series resolution
   - [ ] 7.1 Implement ang pure `resolveSeries` function
-    - I-validate na best-of-N ∈ {3,5,7}; winner = unang Team na aabot ng >N/2 game wins; walang winner bago maabot ang majority
+    - I-validate na best-of-N ∈ {1,3,5,7}; winner = unang Team na aabot ng >N/2 game wins; walang winner bago maabot ang majority
     - _Requirements: 9.10, 9.11, 9.12_
   - [ ]* 7.2 Write property test para sa best-of-N validation at majority winner
     - **Property 22: Series best-of-N validation and majority winner**
