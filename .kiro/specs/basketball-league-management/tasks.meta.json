@@ -1,0 +1,695 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1. Project scaffolding at shared foundation": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892759360
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892781563
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789893959384
+      }
+    ],
+    "2.1 Define ang shared domain types at enums": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892760106
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789893968072
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894067494
+      }
+    ],
+    "2.3 Implement ang error taxonomy": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892760233
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894078989
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894238983
+      }
+    ],
+    "3.1 Implement ang pure `sessionState` at `lockoutState` functions": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892760362
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894080073
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894247218
+      }
+    ],
+    "3.6 Implement ang pure `authorize` function": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892760439
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894081296
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894248610
+      }
+    ],
+    "4.1 Implement ang pure `rankTeams` comparator": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892760521
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894082410
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894248905
+      }
+    ],
+    "5.1 Implement ang pure `aggregateStatistics` function": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892760594
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894083401
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894249499
+      }
+    ],
+    "6. Checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892760685
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894579324
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894639332
+      }
+    ],
+    "7.1 Implement ang pure `resolveSeries` function": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892760764
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894254976
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894407120
+      }
+    ],
+    "8.1 Implement ang pure `detectVenueConflict` function": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892760839
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894256403
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894408067
+      }
+    ],
+    "9.1 Implement ang pure `validateBatch` function": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892760907
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894257525
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894409462
+      }
+    ],
+    "10.1 Implement ang pure `roundRobinPairings` function": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892760978
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894258746
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894410414
+      }
+    ],
+    "10.3 Implement ang pure `distributeGames` function": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892761044
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894259767
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894411583
+      }
+    ],
+    "11.1 Implement ang regular-season awards computation (`computeRegularSeasonAwards`)": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892761119
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894418022
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894558224
+      }
+    ],
+    "11.5 Implement ang Finals MVP computation (`computeFinalsMvp`)": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892761207
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894419189
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894559265
+      }
+    ],
+    "12. Checkpoint - Ensure all pure domain tests pass": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892761275
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894651269
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894710602
+      }
+    ],
+    "13.1 Define ang database schema at migrations": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892761343
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894735449
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894911205
+      }
+    ],
+    "13.2 Implement ang repositories na may transactional support": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892761405
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894917239
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789895275606
+      }
+    ],
+    "14.1 Implement ang TeamService": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892761476
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789895284097
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789895530060
+      }
+    ],
+    "14.4 Implement ang PlayerService/RosterService": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892761549
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789895285220
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789895531253
+      }
+    ],
+    "15.1 Implement ang manual SchedulingService": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892761614
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789895543249
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789895800595
+      }
+    ],
+    "15.4 Implement ang ScoringService": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892761707
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789895544412
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789895801730
+      }
+    ],
+    "16.1 Implement ang StandingsService": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892761831
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789895545622
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789895802963
+      }
+    ],
+    "16.3 Implement ang StatisticsService": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892761899
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789895546754
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789895803897
+      }
+    ],
+    "16.4 Implement ang SeasonTournamentService": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892761966
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789895286168
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789895532207
+      }
+    ],
+    "17. Checkpoint - Ensure all service tests pass": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892762035
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789896133413
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789896140007
+      }
+    ],
+    "18.1 Implement ang BatchUploadService": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892762099
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789895810711
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789896126993
+      }
+    ],
+    "18.3 Implement ang automatic SchedulingService (draft)": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892762171
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789895811544
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789896127832
+      }
+    ],
+    "18.6 Implement ang AwardsService": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892762240
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789895547721
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789895804981
+      }
+    ],
+    "19.1 Implement ang Authentication + Authorization middleware": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892762310
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789896151803
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789896390781
+      }
+    ],
+    "19.3 Implement ang REST controllers para sa mutating endpoints": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892762379
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789896399011
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789896862080
+      }
+    ],
+    "19.4 Implement ang public browsing endpoints": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892762447
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789896152670
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789896391697
+      }
+    ],
+    "20.1 Implement ang React SPA na kumokonsumo ng REST API": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892762519
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789896881931
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789897719805
+      }
+    ],
+    "22. Final checkpoint - Ensure all tests pass": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789892762602
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789897726744
+      },
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789897997622
+      }
+    ],
+    "2. Core domain types at error taxonomy": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894239073
+      }
+    ],
+    "3. Pure domain: Authentication at Authorization logic": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894248691
+      }
+    ],
+    "4. Pure domain: Standings ranking": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894248982
+      }
+    ],
+    "5. Pure domain: Statistics aggregation": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894249598
+      }
+    ],
+    "7. Pure domain: Series resolution": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894407240
+      }
+    ],
+    "8. Pure domain: Venue conflict detection": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894408149
+      }
+    ],
+    "9. Pure domain: Batch validation": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894409544
+      }
+    ],
+    "10. Pure domain: Round-robin schedule generation": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894411664
+      }
+    ],
+    "11. Pure domain: Awards computation": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789894559321
+      }
+    ],
+    "13. Repository layer": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789895275724
+      }
+    ],
+    "14. Teams at Rosters services": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789895531342
+      }
+    ],
+    "15. Scheduling at Scoring services": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789895801811
+      }
+    ],
+    "16. Standings, Statistics, at Season/Tournament services": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789895803976
+      }
+    ],
+    "18. Batch upload, automatic scheduling, at Awards services": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789896127917
+      }
+    ],
+    "19. Auth middleware at API layer": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789896862204
+      }
+    ],
+    "20. Frontend wiring": [
+      {
+        "executionId": "c558557c-ed49-4754-b26b-a89a652cfdf2",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1789897719902
+      }
+    ]
+  }
+}

@@ -1,0 +1,41 @@
+# Local development PostgreSQL for the Basketball League Management System.
+#
+# Credentials and database name line up with the DATABASE_URL in .env:
+#   postgres://postgres:postgres@localhost:5433/league_manager
+#
+# The host port is 5433 (not the Postgres default 5432) to avoid clashing with
+# a native PostgreSQL install that may already own 5432. Inside the container
+# Postgres still listens on 5432; only the host mapping differs. If you have no
+# local Postgres you can change the mapping back to '5432:5432' and drop the
+# port from DATABASE_URL.
+#
+# Usage:
+#   docker compose up -d          # start Postgres (waits until healthy)
+#   npm run db:migrate            # apply migrations
+#   npm run db:seed               # create the first admin user
+#   docker compose down           # stop (data persists in the named volume)
+#   docker compose down -v        # stop and delete all data
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: league-manager-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: league_manager
+    ports:
+      # Host 5433 → container 5432 (avoids clashing with a native Postgres on 5432).
+      - '5433:5432'
+    volumes:
+      - league-manager-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d league_manager']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  league-manager-pgdata:
