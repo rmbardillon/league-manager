@@ -8,7 +8,7 @@
 import { useSearchParams } from 'react-router-dom';
 import { publicApi, type StandingsPayload } from '../../api/index.js';
 import { useAsync } from '../../hooks/useAsync.js';
-import { SeasonPicker } from '../../components/SeasonPicker.js';
+import { PublicSeasonSelect } from '../../components/PublicSeasonSelect.js';
 import { EmptyMessage, ErrorMessage, LoadingIndicator } from '../../components/Feedback.js';
 
 export function StandingsPage(): JSX.Element {
@@ -20,16 +20,16 @@ export function StandingsPage(): JSX.Element {
     seasonId || null,
   );
 
-  const setSeason = (id: string): void => {
+  const setSeason = (id: string | null): void => {
     setParams(id ? { season: id } : {});
   };
 
   return (
     <section aria-labelledby="standings-heading">
       <h2 id="standings-heading">Standings</h2>
-      <SeasonPicker value={seasonId} onChange={setSeason} inputId="standings-season-id" />
+      <PublicSeasonSelect value={seasonId || null} onChange={setSeason} id="standings-season-id" />
 
-      {!seasonId && <EmptyMessage>Enter a Season ID to view its standings.</EmptyMessage>}
+      {!seasonId && <EmptyMessage>Select a Season to view its standings.</EmptyMessage>}
       {loading && <LoadingIndicator label="Loading standings…" />}
       {error && <ErrorMessage>{error}</ErrorMessage>}
 

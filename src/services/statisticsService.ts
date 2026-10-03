@@ -43,10 +43,12 @@ import { withTransaction } from '../repositories/executor.js';
 import {
   gameRepository,
   playerRepository,
+  rosterAssignmentRepository,
   statisticRepository,
   teamRepository,
   type Executor,
 } from '../repositories/index.js';
+import type { Game } from '../domain/types.js';
 
 // ---------------------------------------------------------------------------
 // Command shapes
@@ -103,11 +105,7 @@ export class StatisticsService {
       // Build the eligibility context from the two participating Teams'
       // rosters so the pure validator can decide whether the Player is on
       // either Team (Req 8.5).
-      const context = await this.buildEligibilityContext(
-        game.homeTeamId,
-        game.awayTeamId,
-        tx,
-      );
+      const context = await this.buildEligibilityContext(game, tx);
 
       const candidate: Statistic = {
         id: '',
@@ -158,9 +156,23 @@ export class StatisticsService {
       }
 
       const seasonStatistics = await this.listSeasonStatistics(seasonId, tx);
-      const roster: RosterContext = {
-        playerTeamById: { [playerId]: player.teamId },
-      };
+
+      // Resolve the Player's Team for this Season via their assignment. A
+      // Player holds at most one assignment per Season; if they have none they
+      // contribute no Team mapping (their per-Player totals are still reported,
+      // just unattributed to any Team) (Req 5.4).
+      const seasonAssignments =
+        await rosterAssignmentRepository.listByPlayerInSeason(
+          playerId,
+          seasonId,
+          tx,
+        );
+      const playerTeamById: Record<string, string> = {};
+      const assignment = seasonAssignments[0];
+      if (assignment) {
+        playerTeamById[playerId] = assignment.teamId;
+      }
+      const roster: RosterContext = { playerTeamById };
 
       const aggregated = aggregateStatistics(
         seasonStatistics.filter((s) => s.playerId === playerId),
@@ -191,13 +203,15 @@ export class StatisticsService {
         });
       }
 
-      const roster = await playerRepository.listByTeam(teamId, tx);
+      const roster = await rosterAssignmentRepository.listByTeam(teamId, tx);
       const playerTeamById: Record<string, string> = {};
-      for (const player of roster) {
-        playerTeamById[player.id] = teamId;
+      for (const assignment of roster) {
+        playerTeamById[assignment.playerId] = teamId;
       }
 
-      const rosterPlayerIds = new Set(roster.map((p) => p.id));
+      const rosterPlayerIds = new Set(
+        roster.map((assignment) => assignment.playerId),
+      );
       const seasonStatistics = await this.listSeasonStatistics(seasonId, tx);
 
       const aggregated = aggregateStatistics(
@@ -215,29 +229,35 @@ export class StatisticsService {
   // -------------------------------------------------------------------------
 
   /**
-   * Build the {@link EligibilityContext} for a Game by mapping each Player on
-   * either participating Team's roster to that Team (Req 8.5). A Player absent
-   * from the map is treated as not eligible by the pure validator.
+   * Build the {@link EligibilityContext} for a Game by mapping each Player
+   * holding a Roster_Assignment to either participating Team to that Team
+   * (Req 8.5, 5.2, 5.3). Both Teams belong to the Game's Season, so an
+   * assignment to the home or away Team is an assignment within that Season; a
+   * Player without such an assignment is absent from the map and treated as not
+   * eligible by the pure validator.
    */
   private async buildEligibilityContext(
-    homeTeamId: string,
-    awayTeamId: string,
+    game: Game,
     ex: Executor,
   ): Promise<EligibilityContext> {
     const [homeRoster, awayRoster] = await Promise.all([
-      playerRepository.listByTeam(homeTeamId, ex),
-      playerRepository.listByTeam(awayTeamId, ex),
+      rosterAssignmentRepository.listByTeam(game.homeTeamId, ex),
+      rosterAssignmentRepository.listByTeam(game.awayTeamId, ex),
     ]);
 
     const playerTeamById: Record<string, string> = {};
-    for (const player of homeRoster) {
-      playerTeamById[player.id] = homeTeamId;
+    for (const assignment of homeRoster) {
+      playerTeamById[assignment.playerId] = assignment.teamId;
     }
-    for (const player of awayRoster) {
-      playerTeamById[player.id] = awayTeamId;
+    for (const assignment of awayRoster) {
+      playerTeamById[assignment.playerId] = assignment.teamId;
     }
 
-    return { homeTeamId, awayTeamId, playerTeamById };
+    return {
+      homeTeamId: game.homeTeamId,
+      awayTeamId: game.awayTeamId,
+      playerTeamById,
+    };
   }
 
   /**

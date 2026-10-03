@@ -11,8 +11,13 @@
  * Route groups:
  *   - /public                       read-only schedule/results/standings/awards (Req 10, 13.15)
  *   - /auth                         sign-in/out and current-principal (Req 1)
- *   - /teams                        Team management (Req 3)
- *   - /players                      roster management (Req 4)
+ *   - /leagues                      authenticated League/Season enumeration for
+ *                                   the management UI selectors (Req 1.1)
+ *   - /teams                        Team management (Req 3) plus team-scoped
+ *                                   roster/assignment subpaths — assign/unassign,
+ *                                   jersey updates, and roster reads (Req 2, 3, 4.1)
+ *   - /players                      master-Player management: CRUD plus
+ *                                   player history (Req 1, 4.3)
  *   - /games                        manual scheduling + scoring (Req 5, 6)
  *   - /statistics                   Statistics recording (Req 8)
  *   - /seasons, /playoff-rounds     Season/Tournament/playoff administration (Req 9)
@@ -26,6 +31,7 @@ import { errorHandler } from './api/middleware/errorHandler.js';
 import { registerPublicRoutes } from './api/routes/public.js';
 import { createTeamsRouter } from './api/routes/teams.js';
 import { createPlayersRouter } from './api/routes/players.js';
+import { createAssignmentsRouter } from './api/routes/assignments.js';
 import { createGamesRouter } from './api/routes/games.js';
 import { createScoresRouter } from './api/routes/scores.js';
 import { createStatisticsRouter } from './api/routes/statistics.js';
@@ -34,6 +40,7 @@ import { createBatchRouter } from './api/routes/batch.js';
 import { createScheduleRouter } from './api/routes/schedule.js';
 import { createAwardsRouter } from './api/routes/awards.js';
 import { createAuthRouter } from './api/routes/auth.js';
+import { createLeaguesRouter } from './api/routes/leagues.js';
 
 export function createApp(): Express {
   const app = express();
@@ -54,7 +61,15 @@ export function createApp(): Express {
   // Auth-guarded mutating routers. Scoring and automatic scheduling both mount
   // additional routes under /games and /seasons respectively; Express composes
   // the overlapping prefixes without conflict.
+  // Two routers share the /teams mount: team CRUD ('/', '/:teamId') and the
+  // team-scoped roster/assignment subpaths ('/:teamId/assignments',
+  // '/:teamId/assignments/:playerId', '/:teamId/roster'). The path sets do not
+  // collide, so Express composes them without conflict.
+  // Authenticated League/Season enumeration for the management UI selectors
+  // (Req 1.1). Administrator-only; see createLeaguesRouter for the guards.
+  app.use('/leagues', createLeaguesRouter());
   app.use('/teams', createTeamsRouter());
+  app.use('/teams', createAssignmentsRouter());
   app.use('/players', createPlayersRouter());
   app.use('/games', createGamesRouter());
   app.use('/games', createScoresRouter());

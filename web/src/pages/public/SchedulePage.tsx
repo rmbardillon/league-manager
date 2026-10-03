@@ -12,7 +12,7 @@
 import { useSearchParams } from 'react-router-dom';
 import { publicApi, type SchedulePayload } from '../../api/index.js';
 import { useAsync } from '../../hooks/useAsync.js';
-import { SeasonPicker } from '../../components/SeasonPicker.js';
+import { PublicSeasonSelect } from '../../components/PublicSeasonSelect.js';
 import { EmptyMessage, ErrorMessage, LoadingIndicator } from '../../components/Feedback.js';
 
 export function SchedulePage(): JSX.Element {
@@ -24,16 +24,16 @@ export function SchedulePage(): JSX.Element {
     seasonId || null,
   );
 
-  const setSeason = (id: string): void => {
+  const setSeason = (id: string | null): void => {
     setParams(id ? { season: id } : {});
   };
 
   return (
     <section aria-labelledby="schedule-heading">
       <h2 id="schedule-heading">Schedule</h2>
-      <SeasonPicker value={seasonId} onChange={setSeason} inputId="schedule-season-id" />
+      <PublicSeasonSelect value={seasonId || null} onChange={setSeason} id="schedule-season-id" />
 
-      {!seasonId && <EmptyMessage>Enter a Season ID to view its schedule.</EmptyMessage>}
+      {!seasonId && <EmptyMessage>Select a Season to view its schedule.</EmptyMessage>}
       {loading && <LoadingIndicator label="Loading schedule…" />}
       {error && <ErrorMessage>{error}</ErrorMessage>}
 

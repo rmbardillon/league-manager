@@ -15,6 +15,13 @@
       "when": 1789894870838,
       "tag": "0001_motionless_black_queen",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790945609076,
+      "tag": "0002_open_vindicator",
+      "breakpoints": true
     }
   ]
 }

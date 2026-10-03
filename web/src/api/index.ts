@@ -6,5 +6,14 @@
  * single `../api` path.
  */
 export { ApiError, request } from './client.js';
-export { authApi, publicApi, teamsApi, playersApi } from './endpoints.js';
+export {
+  authApi,
+  publicApi,
+  leaguesApi,
+  seasonsApi,
+  playoffApi,
+  teamsApi,
+  playersApi,
+  assignmentsApi,
+} from './endpoints.js';
 export type * from './types.js';

@@ -170,12 +170,34 @@ export interface Team {
   name: string;
 }
 
+/** A master Player (a person). */
 export interface Player {
   id: string;
-  teamId: string;
-  /** 1–100 chars. */
+  /** 1–100 chars. Not unique. */
   name: string;
+}
+
+/** Links one master Player to one Team (and thus one Season) with a jersey. */
+export interface RosterAssignment {
+  id: string;
+  playerId: string;
+  teamId: string;
   /** 0–99, unique within the Team roster. */
+  jerseyNumber: number;
+}
+
+/** A roster entry as read for a Team (Player identity + jersey). */
+export interface RosterEntry {
+  playerId: string;
+  name: string;
+  jerseyNumber: number;
+}
+
+/** A player-history entry (which Team/Season and jersey). */
+export interface PlayerHistoryEntry {
+  assignmentId: string;
+  teamId: string;
+  seasonId: string;
   jerseyNumber: number;
 }
 

@@ -42,7 +42,6 @@ import type {
   Award,
   AwardCategory,
   Game,
-  Player,
   Score,
   Statistic,
 } from '../domain/types.js';
@@ -53,6 +52,7 @@ import {
   gameRepository,
   playerRepository,
   playoffRoundRepository,
+  rosterAssignmentRepository,
   scoreRepository,
   seriesRepository,
   statisticRepository,
@@ -341,11 +341,22 @@ export class AwardsService {
       return { available: false };
     }
 
-    // Req 13.9: restrict the candidate pool to the champion Team's roster.
-    const roster = await playerRepository.listByTeam(championTeamId, ex);
-    const championTeamPlayers: FinalsCandidate[] = roster.map((p: Player) => ({
-      playerId: p.id,
-      name: p.name,
+    // Req 13.9 / 6.2: restrict the candidate pool to the champion Team's
+    // roster, now reconstructed from its Roster_Assignments (the Team link
+    // moved off `players` onto `roster_assignments`). Each assignment's master
+    // Player name is resolved via the master `playerRepository`, so recipients
+    // remain master-Player ids (identity preserved, Req 6.1).
+    const championRoster = await rosterAssignmentRepository.listByTeam(
+      championTeamId,
+      ex,
+    );
+    const championPlayerNames = await this.loadPlayerNames(
+      new Set(championRoster.map((a) => a.playerId)),
+      ex,
+    );
+    const championTeamPlayers: FinalsCandidate[] = championRoster.map((a) => ({
+      playerId: a.playerId,
+      name: championPlayerNames[a.playerId] ?? '',
     }));
     if (championTeamPlayers.length === 0) {
       return { available: false };

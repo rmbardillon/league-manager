@@ -18,6 +18,7 @@ import type {
   League,
   Player,
   PlayoffRound,
+  RosterAssignment,
   Score,
   Season,
   Series,
@@ -33,6 +34,7 @@ import type {
   LeagueRow,
   PlayerRow,
   PlayoffRoundRow,
+  RosterAssignmentRow,
   ScoreRow,
   SeasonRow,
   SeriesRow,
@@ -79,10 +81,14 @@ export function toTeam(row: TeamRow): Team {
 }
 
 export function toPlayer(row: PlayerRow): Player {
+  return { id: row.id, name: row.name };
+}
+
+export function toRosterAssignment(row: RosterAssignmentRow): RosterAssignment {
   return {
     id: row.id,
+    playerId: row.playerId,
     teamId: row.teamId,
-    name: row.name,
     jerseyNumber: row.jerseyNumber,
   };
 }

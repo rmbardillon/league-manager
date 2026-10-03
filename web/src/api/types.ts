@@ -23,6 +23,21 @@ export type AwardCategory =
   | 'Assists_Leader'
   | 'Finals_MVP';
 
+/** Tournament formats (mirror src/domain/types.ts). */
+export type TournamentFormat =
+  | 'single-elimination'
+  | 'double-elimination'
+  | 'round-robin';
+
+/** Round-robin schedule kind, required when the format is round-robin. */
+export type RoundRobinKind = 'single' | 'double';
+
+/** Playoff round types (mirror src/domain/types.ts). */
+export type PlayoffRoundType = 'Quarterfinals' | 'Semifinals' | 'Finals';
+
+/** Best-of series length. */
+export type BestOf = 1 | 3 | 5 | 7;
+
 // ---------------------------------------------------------------------------
 // Auth
 // ---------------------------------------------------------------------------
@@ -45,20 +60,64 @@ export interface SignInRequest {
 }
 
 // ---------------------------------------------------------------------------
-// Teams / Players (mutating management)
+// List-read summaries (mirror the authenticated list endpoints)
+// ---------------------------------------------------------------------------
+
+/** One row of `GET /leagues` (Req 1.1). */
+export interface LeagueSummary {
+  id: string;
+  name: string;
+}
+
+/**
+ * One row of `GET /leagues/:leagueId/seasons` (Req 1.2).
+ * Dates cross the wire as ISO date strings (YYYY-MM-DD).
+ */
+export interface SeasonSummary {
+  id: string;
+  name: string;
+  /** ISO date (YYYY-MM-DD). */
+  startDate: string;
+  /** ISO date (YYYY-MM-DD). */
+  endDate: string;
+  closed: boolean;
+}
+
+/** One row of `GET /seasons/:seasonId/teams` (Req 2.1). */
+export interface TeamSummary {
+  id: string;
+  name: string;
+}
+
+/** One row of `GET /seasons/:seasonId/tournaments` (Req 2.3). */
+export interface TournamentSummary {
+  id: string;
+  format: TournamentFormat;
+  roundRobinKind?: RoundRobinKind;
+}
+
+/** One row of `GET /seasons/:seasonId/playoff-rounds` (Req 9 selectors). */
+export interface PlayoffRoundSummary {
+  id: string;
+  type: PlayoffRoundType;
+}
+
+/** One row of `GET /playoff-rounds/:roundId/series` (Req 9 series selector). */
+export interface SeriesSummary {
+  id: string;
+  teamAId: string;
+  teamBId: string;
+  bestOf: BestOf;
+}
+
+// ---------------------------------------------------------------------------
+// Teams (mutating management)
 // ---------------------------------------------------------------------------
 
 export interface Team {
   id: string;
   seasonId: string;
   name: string;
-}
-
-export interface Player {
-  id: string;
-  teamId: string;
-  name: string;
-  jerseyNumber: number;
 }
 
 export interface CreateTeamRequest {
@@ -70,15 +129,95 @@ export interface UpdateTeamRequest {
   name: string;
 }
 
-export interface AddPlayerRequest {
-  teamId: string;
+// ---------------------------------------------------------------------------
+// Master Players / Roster + assignments
+//
+// Mirrors the shapes the `player-master-data` routes already serve. A master
+// Player is a league-wide person record (`GET /players`); a RosterEntry is a
+// Player's membership on one Team (`GET /teams/:teamId/roster`); a
+// RosterAssignment is the response of the assignment mutations.
+// ---------------------------------------------------------------------------
+
+/** Master Player — league-wide person record (`GET /players`). */
+export interface Player {
+  id: string;
+  name: string;
+}
+
+/** A Player's membership on a Team (`GET /teams/:teamId/roster`). */
+export interface RosterEntry {
+  playerId: string;
   name: string;
   jerseyNumber: number;
 }
 
-export interface UpdatePlayerRequest {
-  name?: string;
-  jerseyNumber?: number;
+/** Response of the assignment mutations (`POST`/`PATCH` on assignments). */
+export interface RosterAssignment {
+  id: string;
+  playerId: string;
+  teamId: string;
+  jerseyNumber: number;
+}
+
+/** `POST /players` — register a new master Player. */
+export interface CreatePlayerRequest {
+  name: string;
+}
+
+/** `POST /teams/:teamId/assignments` — assign a master Player to a Team. */
+export interface AssignPlayerRequest {
+  playerId: string;
+  jerseyNumber: number;
+}
+
+/** `PATCH /teams/:teamId/assignments/:playerId` — change a jersey number. */
+export interface UpdateJerseyRequest {
+  jerseyNumber: number;
+}
+
+// ---------------------------------------------------------------------------
+// UI-driven create requests (new typed wire shapes)
+// ---------------------------------------------------------------------------
+
+/** `POST /seasons` (Req 4.2). Dates as ISO date strings. */
+export interface CreateSeasonRequest {
+  leagueId: string;
+  name: string;
+  /** ISO date (YYYY-MM-DD). */
+  startDate: string;
+  /** ISO date (YYYY-MM-DD). */
+  endDate: string;
+}
+
+/** `POST /seasons/:seasonId/tournaments` (Req 8.2). */
+export interface CreateTournamentRequest {
+  format: TournamentFormat;
+  roundRobinKind?: RoundRobinKind;
+}
+
+/** `POST /seasons/:seasonId/playoff-rounds` (Req 9.2). */
+export interface CreatePlayoffRoundRequest {
+  type: PlayoffRoundType;
+}
+
+/** `POST /playoff-rounds/:roundId/series` (Req 9.4). */
+export interface CreateSeriesRequest {
+  teamAId: string;
+  teamBId: string;
+  bestOf: BestOf;
+}
+
+/** `POST /seasons/:seasonId/playoff-games` (Req 9.6). Date as an ISO date string. */
+export interface CreatePlayoffGameRequest {
+  homeTeamId: string;
+  awayTeamId: string;
+  /** ISO date (YYYY-MM-DD). */
+  date: string;
+  startTime?: string | null;
+  durationMinutes?: number | null;
+  venue?: string | null;
+  playoffRoundId: string;
+  seriesId?: string | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -136,6 +275,23 @@ export interface StandingsPayload {
   seasonId: string;
   closed: boolean;
   standings: StandingEntry[];
+  message?: string;
+}
+
+/**
+ * Field-limited public projection of a Season (`GET /public/seasons`, Req 7.4).
+ * Deliberately omits management-only fields (`leagueId`, `startDate`,
+ * `endDate`, `finalStandingsSnapshot`) (Req 7.6).
+ */
+export interface PublicSeasonSummary {
+  id: string;
+  name: string;
+  closed: boolean;
+}
+
+/** Seasons available for public browsing; empty → `{ seasons: [], message }` (Req 7.5). */
+export interface PublicSeasonsPayload {
+  seasons: PublicSeasonSummary[];
   message?: string;
 }
 

@@ -9,6 +9,7 @@ import react from '@vitejs/plugin-react';
 // set VITE_API_BASE_URL instead of relying on this proxy.
 const apiPrefixes = [
   '/auth',
+  '/leagues',
   '/public',
   '/teams',
   '/players',

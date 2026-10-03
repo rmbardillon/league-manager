@@ -23,6 +23,7 @@ import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import { sessionState } from '../../domain/auth.js';
 import { authorize, type Action, type AuthUser, type ResourceRef } from '../../domain/authorize.js';
 import { AuthenticationError, AuthorizationError } from '../../domain/errors.js';
+import type { Role } from '../../domain/types.js';
 import { db } from '../../db/client.js';
 import { sessionRepository, userRepository } from '../../repositories/index.js';
 import type { Database } from '../../repositories/executor.js';
@@ -200,6 +201,44 @@ export function authorizeRequest(action: Action, resource: ResourceResolver): Re
     const decision = authorize(auth.user, action, resource(req));
     if (!decision.allowed) {
       next(new AuthorizationError(decision.reason));
+      return;
+    }
+
+    next();
+  };
+}
+
+/**
+ * Role-based read guard factory. The read-side analogue of
+ * {@link authorizeRequest}: rather than reusing the pure {@link authorize}
+ * create/update/delete semantics (which read oddly for list-reads), it decides
+ * purely on the authenticated principal's primary role.
+ *
+ * Must run after {@link authenticate}. The request is:
+ *   - rejected as a 401 {@link AuthenticationError} when `req.auth` is absent
+ *     (unauthenticated rather than silently allowed) — Req 1.6, 1.7;
+ *   - rejected as a 403 {@link AuthorizationError} when the User's `role` is not
+ *     in `allowed`, which includes a User with no primary role (`null`) — Req
+ *     2.9;
+ *   - otherwise allowed to continue via `next()`.
+ *
+ * Admin-only reads use `authorizeRoleRequest(['Administrator'])`. This leaves
+ * the pure {@link authorize} function (and its property test) untouched.
+ *
+ * @param allowed The roles permitted to proceed; a `null` role is never
+ *   permitted.
+ */
+export function authorizeRoleRequest(allowed: readonly Role[]): RequestHandler {
+  return (req: Request, _res: Response, next: NextFunction): void => {
+    const auth = req.auth;
+    if (auth == null) {
+      next(new AuthenticationError('Authentication is required.'));
+      return;
+    }
+
+    const role = auth.user.role;
+    if (role == null || !allowed.includes(role)) {
+      next(new AuthorizationError('You are not authorized to perform this action.'));
       return;
     }
 

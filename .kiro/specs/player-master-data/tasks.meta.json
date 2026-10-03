@@ -1,0 +1,607 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Reshape the Drizzle schema and add `roster_assignments`": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945278103
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945289110
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945362214
+      }
+    ],
+    "1.2 Extract the pure `backfillPlayers` transform": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945278167
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945380843
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945516751
+      }
+    ],
+    "1.4 Generate and hand-edit the migration SQL": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945278234
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945535401
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945694661
+      }
+    ],
+    "1.5 Update repository mappers for the new shapes": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945278284
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945381065
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945517671
+      }
+    ],
+    "2. Checkpoint - Ensure pure/migration-layer tests pass": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945278351
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945724451
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945757114
+      }
+    ],
+    "3.1 Reshape `playerRepository` to master CRUD": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945278394
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945533314
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945696044
+      }
+    ],
+    "3.2 Add `rosterAssignmentRepository`": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945278435
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945534510
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945697182
+      }
+    ],
+    "4.1 Update domain types for the model split": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945278476
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945532416
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945697848
+      }
+    ],
+    "5.1 Implement master Player methods in `playerService`": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945278523
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945772858
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945965942
+      }
+    ],
+    "5.5 Implement assignment methods in `playerService`": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945278568
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945975952
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790946164023
+      }
+    ],
+    "5.10 Implement roster and player-history reads in `playerService`": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945278614
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790946181782
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790946345023
+      }
+    ],
+    "6. Checkpoint - Ensure player service tests pass": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945278662
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790946529284
+      }
+    ],
+    "7.1 Build player→team mapping from assignments in `statisticsService`": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945278709
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945774059
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945967335
+      }
+    ],
+    "8.1 Build champion candidate pool from assignments in `awardsService`": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945278751
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945775451
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945968538
+      }
+    ],
+    "9.1 Create a master Player + assignment per row in `batchUploadService`": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945278822
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945776416
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945969450
+      }
+    ],
+    "9.2 Update the batch upload service test to the new create shapes": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945278865
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945976814
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790946164888
+      }
+    ],
+    "10. Checkpoint - Ensure all service tests pass": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945278908
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790946530359
+      }
+    ],
+    "11.1 Split `players.ts` into master Player routes": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945278962
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790946182927
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790946346186
+      }
+    ],
+    "11.2 Add team-scoped `assignments.ts` routes": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945279012
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790946183909
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790946347360
+      }
+    ],
+    "11.3 Wire the routers in `app.ts`": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945279055
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790946348332
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790946435723
+      }
+    ],
+    "13. Final checkpoint - Ensure typecheck, lint, build, and tests pass": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945279102
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790946535635
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790946576685
+      }
+    ],
+    "1. Schema, migration, and backfill foundation": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945694707
+      }
+    ],
+    "3. Repository layer": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945697231
+      }
+    ],
+    "4. Domain types": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945697890
+      }
+    ],
+    "7. Statistics service reconciliation": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945967372
+      }
+    ],
+    "8. Awards service reconciliation": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790945968577
+      }
+    ],
+    "9. Batch upload reconciliation": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790946164927
+      }
+    ],
+    "5. Player service: master and assignment methods": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790946345076
+      }
+    ],
+    "11. API routes": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790946435773
+      }
+    ],
+    "1.6 Write unit tests for the updated mappers": [
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790946473604
+      },
+      {
+        "executionId": "38545b68-8669-43f1-9b76-a8d433f431f4",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790946528138
+      }
+    ],
+    "12.1 Verify existing statistics/award references resolve post-migration": [
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985398002
+      },
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985404956
+      }
+    ],
+    "12. Identity-preservation verification": [
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985405009
+      }
+    ],
+    "1.3 Write property tests for `backfillPlayers`": [
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985420935
+      },
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985711270
+      }
+    ],
+    "5.2 Write property test for Player identity shape and non-unique names": [
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985422321
+      },
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985712203
+      }
+    ],
+    "7.2 Write property test for assignment-based eligibility": [
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985423015
+      },
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985722100
+      }
+    ],
+    "5.3 Write property test for rename preserving assignments": [
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985432861
+      },
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985713585
+      }
+    ],
+    "5.4 Write property test for deletion gating": [
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985433810
+      },
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985714532
+      }
+    ],
+    "5.6 Write property test for jersey uniqueness within a Team": [
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985435204
+      },
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985715932
+      }
+    ],
+    "5.7 Write property test for one-per-season (cross-season allowed)": [
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985436166
+      },
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985716890
+      }
+    ],
+    "5.8 Write property test for unassign isolation": [
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985437576
+      },
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985718325
+      }
+    ],
+    "5.9 Write property test for authorization non-disclosure": [
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985438524
+      },
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985719445
+      }
+    ],
+    "5.11 Write property tests for roster and history read shapes": [
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985439903
+      },
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985720649
+      }
+    ],
+    "7.3 Write property test for assignment-based aggregation attribution": [
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985440806
+      },
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985722753
+      }
+    ],
+    "8.2 Write unit test for assignment-based candidate-pool derivation": [
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985733419
+      },
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985983152
+      }
+    ],
+    "9.3 Write property test for batch creating a new master and assignment per row": [
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985734843
+      },
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985984515
+      }
+    ],
+    "11.4 Write DB-less route tests for players and assignments": [
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985735632
+      },
+      {
+        "executionId": "cbe817f4-ed28-41d6-8863-a814b728f3e1",
+        "chatSessionId": "sess_e013a16d-a223-4d55-9c03-b592284f45bb",
+        "timestamp": 1790985985512
+      }
+    ]
+  }
+}

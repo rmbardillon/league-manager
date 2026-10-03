@@ -24,13 +24,29 @@
  * _Requirements: 9.1_
  */
 import { Router } from 'express';
-import { authenticate, authorizeRequest, type ResourceResolver } from '../middleware/auth.js';
+import {
+  authenticate,
+  authorizeRequest,
+  authorizeRoleRequest,
+  type ResourceResolver,
+} from '../middleware/auth.js';
 import { db } from '../../db/client.js';
-import { ValidationError } from '../../domain/errors.js';
-import { PlayoffRoundTypes, type PlayoffRoundType, type TournamentFormat } from '../../domain/types.js';
+import { NotFoundError, ValidationError } from '../../domain/errors.js';
+import {
+  PlayoffRoundTypes,
+  type PlayoffRoundType,
+  type TournamentFormat,
+} from '../../domain/types.js';
 import { SeasonTournamentService } from '../../services/seasonTournamentService.js';
 import { StandingsService } from '../../services/standingsService.js';
-import { playoffRoundRepository } from '../../repositories/index.js';
+import {
+  playoffRoundRepository,
+  seasonRepository,
+  seriesRepository,
+  teamRepository,
+  tournamentRepository,
+} from '../../repositories/index.js';
+import { withTransaction } from '../../repositories/executor.js';
 import {
   asyncHandler,
   param,
@@ -45,11 +61,103 @@ import {
 /** Administrator-only resource for League/Season administration. */
 const adminResource: ResourceResolver = () => ({ kind: 'admin' });
 
+/** A Team of a Season for selector display (Req 2.1). */
+export interface TeamSummary {
+  id: string;
+  name: string;
+}
+
+/** A Tournament of a Season for the Tournament management view (Req 2.2). */
+export interface TournamentSummary {
+  id: string;
+  format: TournamentFormat;
+  /** Present when the format is round-robin. */
+  roundRobinKind?: 'single' | 'double';
+}
+
+/** A Playoff_Round of a Season for the Playoff management view (Req 2.7). */
+export interface PlayoffRoundSummary {
+  id: string;
+  type: PlayoffRoundType;
+}
+
+/** A Series of a Playoff_Round for the Playoff management view (Req 2.9). */
+export interface SeriesSummary {
+  id: string;
+  teamAId: string;
+  teamBId: string;
+  bestOf: number;
+}
+
 /** Build the Season/Tournament management router. */
 export function createSeasonsRouter(): Router {
   const router = Router();
   const service = new SeasonTournamentService(db);
   const standingsService = new StandingsService(db);
+
+  router.get(
+    '/:seasonId/teams',
+    authenticate(),
+    authorizeRoleRequest(['Administrator']),
+    asyncHandler(async (req, res) => {
+      const seasonId = param(req.params.seasonId);
+      const payload = await withTransaction(db, async (tx) => {
+        // Distinguish an unknown Season (404) from a known Season with no
+        // Teams (empty list) — Req 2.1, 2.8.
+        const season = await seasonRepository.findById(seasonId, tx);
+        if (!season) {
+          throw new NotFoundError('The specified Season does not exist.', { seasonId });
+        }
+        const teams = await teamRepository.listBySeason(seasonId, tx);
+        return teams.map((team): TeamSummary => ({ id: team.id, name: team.name }));
+      });
+      res.json(payload);
+    }),
+  );
+
+  router.get(
+    '/:seasonId/tournaments',
+    authenticate(),
+    authorizeRoleRequest(['Administrator']),
+    asyncHandler(async (req, res) => {
+      const seasonId = param(req.params.seasonId);
+      const payload = await withTransaction(db, async (tx) => {
+        const season = await seasonRepository.findById(seasonId, tx);
+        if (!season) {
+          throw new NotFoundError('The specified Season does not exist.', { seasonId });
+        }
+        const tournaments = await tournamentRepository.listBySeason(seasonId, tx);
+        return tournaments.map(
+          (tournament): TournamentSummary => ({
+            id: tournament.id,
+            format: tournament.format,
+            ...(tournament.roundRobinKind !== undefined
+              ? { roundRobinKind: tournament.roundRobinKind }
+              : {}),
+          }),
+        );
+      });
+      res.json(payload);
+    }),
+  );
+
+  router.get(
+    '/:seasonId/playoff-rounds',
+    authenticate(),
+    authorizeRoleRequest(['Administrator']),
+    asyncHandler(async (req, res) => {
+      const seasonId = param(req.params.seasonId);
+      const payload = await withTransaction(db, async (tx) => {
+        const season = await seasonRepository.findById(seasonId, tx);
+        if (!season) {
+          throw new NotFoundError('The specified Season does not exist.', { seasonId });
+        }
+        const rounds = await playoffRoundRepository.listBySeason(seasonId, tx);
+        return rounds.map((round): PlayoffRoundSummary => ({ id: round.id, type: round.type }));
+      });
+      res.json(payload);
+    }),
+  );
 
   router.post(
     '/',
@@ -148,6 +256,25 @@ export function createSeasonsRouter(): Router {
 export function createSeriesRouter(): Router {
   const router = Router();
   const service = new SeasonTournamentService(db);
+
+  router.get(
+    '/:roundId/series',
+    authenticate(),
+    authorizeRoleRequest(['Administrator']),
+    asyncHandler(async (req, res) => {
+      const roundId = param(req.params.roundId);
+      const list = await seriesRepository.listByRound(roundId, db);
+      const payload = list.map(
+        (item): SeriesSummary => ({
+          id: item.id,
+          teamAId: item.teamAId,
+          teamBId: item.teamBId,
+          bestOf: item.bestOf,
+        }),
+      );
+      res.json(payload);
+    }),
+  );
 
   router.post(
     '/:roundId/series',

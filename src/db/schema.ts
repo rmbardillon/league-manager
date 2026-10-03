@@ -168,18 +168,39 @@ export const players = pgTable(
   'players',
   {
     id: uuid('id').primaryKey().defaultRandom(),
+    // 1–100 chars; NOT unique (names are not globally unique).
+    name: text('name').notNull(),
+  },
+  (t) => [check('players_name_len_chk', sql`char_length(${t.name}) between 1 and 100`)],
+);
+
+/**
+ * Roster_Assignment — links one master Player to one Team (and, since a Team
+ * belongs to exactly one Season, to one Season) with a jersey number.
+ *
+ * - `player_id` uses onDelete 'restrict' so the database backstops Req 1.8
+ *   (a master Player cannot be deleted while still assigned).
+ * - `team_id` uses onDelete 'cascade' so deleting a Team removes its roster.
+ *
+ * Jersey uniqueness within a Team is a direct carry-over of the former
+ * `players_team_jersey_uq` constraint.
+ */
+export const rosterAssignments = pgTable(
+  'roster_assignments',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    playerId: uuid('player_id')
+      .notNull()
+      .references(() => players.id, { onDelete: 'restrict' }),
     teamId: uuid('team_id')
       .notNull()
       .references(() => teams.id, { onDelete: 'cascade' }),
-    // 1–100 chars.
-    name: text('name').notNull(),
-    // 0–99, unique within the Team roster.
+    // 0–99, unique within a Team's roster.
     jerseyNumber: smallint('jersey_number').notNull(),
   },
   (t) => [
-    unique('players_team_jersey_uq').on(t.teamId, t.jerseyNumber),
-    check('players_name_len_chk', sql`char_length(${t.name}) between 1 and 100`),
-    check('players_jersey_range_chk', sql`${t.jerseyNumber} between 0 and 99`),
+    unique('roster_assignments_team_jersey_uq').on(t.teamId, t.jerseyNumber),
+    check('roster_assignments_jersey_range_chk', sql`${t.jerseyNumber} between 0 and 99`),
   ],
 );
 
@@ -401,6 +422,8 @@ export type TeamRow = typeof teams.$inferSelect;
 export type NewTeamRow = typeof teams.$inferInsert;
 export type PlayerRow = typeof players.$inferSelect;
 export type NewPlayerRow = typeof players.$inferInsert;
+export type RosterAssignmentRow = typeof rosterAssignments.$inferSelect;
+export type NewRosterAssignmentRow = typeof rosterAssignments.$inferInsert;
 export type PlayoffRoundRow = typeof playoffRounds.$inferSelect;
 export type NewPlayoffRoundRow = typeof playoffRounds.$inferInsert;
 export type SeriesRow = typeof series.$inferSelect;

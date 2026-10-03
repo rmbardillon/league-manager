@@ -8,7 +8,7 @@
 import { useSearchParams } from 'react-router-dom';
 import { publicApi, type ResultsPayload } from '../../api/index.js';
 import { useAsync } from '../../hooks/useAsync.js';
-import { SeasonPicker } from '../../components/SeasonPicker.js';
+import { PublicSeasonSelect } from '../../components/PublicSeasonSelect.js';
 import { EmptyMessage, ErrorMessage, LoadingIndicator } from '../../components/Feedback.js';
 
 /** Format an ISO timestamp as a local calendar date for display. */
@@ -26,16 +26,16 @@ export function ResultsPage(): JSX.Element {
     seasonId || null,
   );
 
-  const setSeason = (id: string): void => {
+  const setSeason = (id: string | null): void => {
     setParams(id ? { season: id } : {});
   };
 
   return (
     <section aria-labelledby="results-heading">
       <h2 id="results-heading">Results</h2>
-      <SeasonPicker value={seasonId} onChange={setSeason} inputId="results-season-id" />
+      <PublicSeasonSelect value={seasonId || null} onChange={setSeason} id="results-season-id" />
 
-      {!seasonId && <EmptyMessage>Enter a Season ID to view its results.</EmptyMessage>}
+      {!seasonId && <EmptyMessage>Select a Season to view its results.</EmptyMessage>}
       {loading && <LoadingIndicator label="Loading results…" />}
       {error && <ErrorMessage>{error}</ErrorMessage>}
 

@@ -39,7 +39,11 @@ import { authorize, type AuthUser } from '../domain/authorize.js';
 import { AuthorizationError, BatchValidationError } from '../domain/errors.js';
 import { withTransaction } from '../repositories/executor.js';
 import type { Database } from '../repositories/executor.js';
-import { playerRepository, teamRepository } from '../repositories/index.js';
+import {
+  playerRepository,
+  rosterAssignmentRepository,
+  teamRepository,
+} from '../repositories/index.js';
 
 // ---------------------------------------------------------------------------
 // Input + result shapes
@@ -344,13 +348,19 @@ export class BatchUploadService {
   }
 
   /**
-   * Import validated rows inside one transaction (Req 11.2, 11.3).
+   * Import validated rows inside one transaction (Req 8.1, 8.2, 8.3).
    *
    * Teams are deduplicated by case-insensitive name so each distinct Team named
-   * across the rows is created exactly once; every row's Player is then created
-   * against its Team. The whole write is a single {@link withTransaction} unit,
-   * so any failure (e.g. a database constraint) rolls the entire import back and
-   * leaves the Season unchanged.
+   * across the rows is created exactly once. Then, under the master-Player
+   * model, **every row produces a new master Player** `{ name }` — an existing
+   * master is never reused (Req 8.3) — paired with a Roster_Assignment linking
+   * that new master to the row's Team with the row's jersey number. The whole
+   * write is a single {@link withTransaction} unit, so any failure (e.g. a
+   * database constraint) rolls the entire import back and leaves the Season
+   * unchanged (all-or-nothing — Req 8.1/8.2).
+   *
+   * `playersCreated` counts one master Player per row, and the number of
+   * assignments created equals the number of rows.
    */
   private async importRows(
     seasonId: string,
@@ -369,7 +379,7 @@ export class BatchUploadService {
       }
 
       // Create each distinct Team once and remember its id per case-insensitive
-      // key so Players can be attached.
+      // key so assignments can be attached.
       const teamIdByKey = new Map<string, string>();
       const teamInputs = [...teamNameByKey.entries()].map(([, name]) => ({
         seasonId,
@@ -380,16 +390,25 @@ export class BatchUploadService {
         teamIdByKey.set(team.name.trim().toLowerCase(), team.id);
       });
 
-      // Create every row's Player against its Team.
-      const playerInputs = rows.map((row) => {
+      // Create one new master Player per row (never reusing an existing master,
+      // Req 8.3), preserving row order so each created master pairs back to its
+      // row's Team and jersey.
+      const playerInputs = rows.map((row) => ({
+        name: row.playerName as string,
+      }));
+      const createdPlayers = await playerRepository.createMany(playerInputs, tx);
+
+      // Pair each created master (by row order) with its row's Team and jersey,
+      // then create the roster assignments in the same transaction.
+      const assignmentInputs = rows.map((row, index) => {
         const key = (row.teamName as string).trim().toLowerCase();
         return {
+          playerId: createdPlayers[index]!.id,
           teamId: teamIdByKey.get(key)!,
-          name: row.playerName as string,
           jerseyNumber: row.jerseyNumber as number,
         };
       });
-      const createdPlayers = await playerRepository.createMany(playerInputs, tx);
+      await rosterAssignmentRepository.createMany(assignmentInputs, tx);
 
       return {
         teamsCreated: createdTeams.length,

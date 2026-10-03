@@ -16,10 +16,12 @@
  *   - `/manage`      management home (auth-gated)
  *   - `/manage/teams`   Team management (Administrator-only, Req 3.1)
  *   - `/manage/players` roster management (auth-gated, Req 4.1)
+ *   - `/manage/seasons`     Season management (Administrator-only, Req 8.1)
+ *   - `/manage/tournaments` Tournament management (Administrator-only, Req 9.1)
+ *   - `/manage/playoffs`    Playoff management (Administrator-only, Req 4.1)
  *   - `*`            not-found fallback
  */
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import './styles.css';
 import { AuthProvider } from './auth/AuthContext.js';
 import { ProtectedRoute } from './auth/ProtectedRoute.js';
 import { Layout } from './components/Layout.js';
@@ -33,6 +35,9 @@ import { AwardsPage } from './pages/public/AwardsPage.js';
 import { ManageHome } from './pages/manage/ManageHome.js';
 import { TeamsPage } from './pages/manage/TeamsPage.js';
 import { PlayersPage } from './pages/manage/PlayersPage.js';
+import { SeasonsPage } from './pages/manage/SeasonsPage.js';
+import { TournamentsPage } from './pages/manage/TournamentsPage.js';
+import { PlayoffsPage } from './pages/manage/PlayoffsPage.js';
 
 /** The route table, router-agnostic so it can be mounted in tests. */
 export function AppRoutes(): JSX.Element {
@@ -66,6 +71,30 @@ export function AppRoutes(): JSX.Element {
           element={
             <ProtectedRoute>
               <PlayersPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="manage/seasons"
+          element={
+            <ProtectedRoute requireAdmin>
+              <SeasonsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="manage/tournaments"
+          element={
+            <ProtectedRoute requireAdmin>
+              <TournamentsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="manage/playoffs"
+          element={
+            <ProtectedRoute requireAdmin>
+              <PlayoffsPage />
             </ProtectedRoute>
           }
         />

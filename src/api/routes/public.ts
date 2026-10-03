@@ -35,12 +35,13 @@
  */
 import { Router, type Request, type Response, type NextFunction } from 'express';
 import { NotFoundError } from '../../domain/errors.js';
-import type { Award, Game, Score, StandingRow, Team } from '../../domain/types.js';
+import type { Award, Game, Score, Season, StandingRow, Team } from '../../domain/types.js';
 import type { Database, Executor } from '../../repositories/executor.js';
 import { withTransaction } from '../../repositories/executor.js';
 import {
   awardRepository,
   gameRepository,
+  leagueRepository,
   scoreRepository,
   seasonRepository,
   teamRepository,
@@ -129,6 +130,33 @@ export interface PublishedAwardsPayload {
   message?: string;
 }
 
+/**
+ * The browsing-safe projection of a Season for the public Season Selector
+ * (Req 7.4, 7.6).
+ *
+ * Exposes exactly the fields a Viewer needs to pick a Season by name — its
+ * Identifier, name, and closed flag — and nothing restricted to authenticated
+ * management flows (never `leagueId`, `startDate`, `endDate`, or
+ * `finalStandingsSnapshot`).
+ */
+export interface PublicSeasonSummary {
+  id: string;
+  name: string;
+  closed: boolean;
+}
+
+/**
+ * The public Seasons list response (Req 7.4, 7.5). Lists every Season
+ * available for public browsing across all Leagues. When none exist the
+ * response is an informational payload with an empty list — never a 404
+ * (Req 7.5).
+ */
+export interface PublicSeasonsPayload {
+  seasons: PublicSeasonSummary[];
+  /** Informational message; present when there are no Seasons to browse. */
+  message?: string;
+}
+
 // ---------------------------------------------------------------------------
 // Helpers (pure, I/O-free)
 // ---------------------------------------------------------------------------
@@ -146,6 +174,18 @@ function paramValue(value: string | string[] | undefined): string {
 /** Build a Team-id → name lookup from a Season's Teams. */
 function teamNameMap(teams: Team[]): Map<string, string> {
   return new Map(teams.map((t) => [t.id, t.name]));
+}
+
+/**
+ * Project a Season onto its browsing-safe public summary (Req 7.6).
+ *
+ * Returns exactly `{id, name, closed}` and deliberately drops every
+ * management-only field (`leagueId`, `startDate`, `endDate`,
+ * `finalStandingsSnapshot`) so the public Selector never leaks data restricted
+ * to authenticated flows. Pure and I/O-free.
+ */
+export function toPublicSeason(season: Season): PublicSeasonSummary {
+  return { id: season.id, name: season.name, closed: season.closed };
 }
 
 /** Format a Date as an ISO calendar date (YYYY-MM-DD). */
@@ -273,6 +313,25 @@ async function buildResults(seasonId: string, ex: Executor): Promise<ResultsPayl
   return payload;
 }
 
+/**
+ * Build the public Seasons payload (Req 7.4, 7.5). Reads every League's Seasons
+ * in one snapshot and projects each via {@link toPublicSeason}. An empty result
+ * yields an informational payload with an empty list, never a 404 (Req 7.5).
+ */
+async function buildPublicSeasons(ex: Executor): Promise<PublicSeasonsPayload> {
+  const leagues = await leagueRepository.list(ex);
+  const seasonLists = await Promise.all(
+    leagues.map((league) => seasonRepository.listByLeague(league.id, ex)),
+  );
+  const seasons = seasonLists.flat().map(toPublicSeason);
+
+  const payload: PublicSeasonsPayload = { seasons };
+  if (seasons.length === 0) {
+    payload.message = 'No Seasons are available for browsing yet.';
+  }
+  return payload;
+}
+
 // ---------------------------------------------------------------------------
 // Route registration
 // ---------------------------------------------------------------------------
@@ -297,6 +356,17 @@ export function createPublicRouter(db: Database): Router {
     (req: Request, res: Response, next: NextFunction): void => {
       handler(req, res).catch(next);
     };
+
+  router.get(
+    '/seasons',
+    wrap(async (_req, res) => {
+      // Lists every browsable Season across all Leagues for the public Season
+      // Selector. No authentication (Req 7.4); empty → informational payload,
+      // never a 404 (Req 7.5).
+      const payload = await withTransaction(db, (tx) => buildPublicSeasons(tx));
+      res.json(payload);
+    }),
+  );
 
   router.get(
     '/seasons/:seasonId/schedule',

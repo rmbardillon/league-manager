@@ -5,6 +5,7 @@ import type {
   LeagueRow,
   PlayerRow,
   PlayoffRoundRow,
+  RosterAssignmentRow,
   ScoreRow,
   SeasonRow,
   SeriesRow,
@@ -20,6 +21,7 @@ import {
   toLeague,
   toPlayer,
   toPlayoffRound,
+  toRosterAssignment,
   toScore,
   toSeason,
   toSeries,
@@ -104,11 +106,21 @@ describe('repository mappers', () => {
     const teamRow: TeamRow = { id: 't1', seasonId: 's1', name: 'Aces' };
     expect(toTeam(teamRow)).toEqual({ id: 't1', seasonId: 's1', name: 'Aces' });
 
-    const playerRow: PlayerRow = { id: 'p1', teamId: 't1', name: 'Jordan', jerseyNumber: 23 };
-    expect(toPlayer(playerRow)).toEqual({
-      id: 'p1',
+    const playerRow: PlayerRow = { id: 'p1', name: 'Jordan' };
+    expect(toPlayer(playerRow)).toEqual({ id: 'p1', name: 'Jordan' });
+  });
+
+  it('maps a roster assignment row', () => {
+    const row: RosterAssignmentRow = {
+      id: 'a1',
+      playerId: 'p1',
       teamId: 't1',
-      name: 'Jordan',
+      jerseyNumber: 23,
+    };
+    expect(toRosterAssignment(row)).toEqual({
+      id: 'a1',
+      playerId: 'p1',
+      teamId: 't1',
       jerseyNumber: 23,
     });
   });

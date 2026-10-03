@@ -16,7 +16,8 @@ export * from './executor.js';
 export * from './mappers.js';
 export { leagueRepository } from './leagueRepository.js';
 export { seasonRepository, tournamentRepository } from './seasonRepository.js';
-export { teamRepository, playerRepository } from './teamRepository.js';
+export { teamRepository } from './teamRepository.js';
+export { playerRepository } from './playerRepository.js';
 export {
   gameRepository,
   scoreRepository,
@@ -25,3 +26,4 @@ export {
 export { playoffRoundRepository, seriesRepository } from './playoffRepository.js';
 export { userRepository, sessionRepository } from './userRepository.js';
 export { awardRepository } from './awardRepository.js';
+export { rosterAssignmentRepository } from './rosterAssignmentRepository.js';

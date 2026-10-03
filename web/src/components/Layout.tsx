@@ -78,6 +78,27 @@ export function Layout(): JSX.Element {
                 </NavLink>
               </li>
             )}
+            {isAuthenticated && isAdmin && (
+              <li>
+                <NavLink to="/manage/seasons" className={navClass}>
+                  Seasons
+                </NavLink>
+              </li>
+            )}
+            {isAuthenticated && isAdmin && (
+              <li>
+                <NavLink to="/manage/tournaments" className={navClass}>
+                  Tournaments
+                </NavLink>
+              </li>
+            )}
+            {isAuthenticated && isAdmin && (
+              <li>
+                <NavLink to="/manage/playoffs" className={navClass}>
+                  Playoffs
+                </NavLink>
+              </li>
+            )}
           </ul>
         </nav>
         <div className="auth-controls">

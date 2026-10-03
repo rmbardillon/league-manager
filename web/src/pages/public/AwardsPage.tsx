@@ -15,7 +15,7 @@ import {
   type PublishedAwardsPayload,
 } from '../../api/index.js';
 import { useAsync } from '../../hooks/useAsync.js';
-import { SeasonPicker } from '../../components/SeasonPicker.js';
+import { PublicSeasonSelect } from '../../components/PublicSeasonSelect.js';
 import { EmptyMessage, ErrorMessage, LoadingIndicator } from '../../components/Feedback.js';
 
 /** Human-readable labels for each Award category. */
@@ -37,22 +37,22 @@ export function AwardsPage(): JSX.Element {
     scopeId || null,
   );
 
-  const setScope = (id: string): void => {
+  const setScope = (id: string | null): void => {
     setParams(id ? { season: id } : {});
   };
 
   return (
     <section aria-labelledby="awards-heading">
       <h2 id="awards-heading">Published Awards</h2>
-      <SeasonPicker
-        value={scopeId}
+      <PublicSeasonSelect
+        value={scopeId || null}
         onChange={setScope}
-        label="Season / Tournament ID"
-        inputId="awards-scope-id"
+        label="Season"
+        id="awards-scope-id"
       />
 
       {!scopeId && (
-        <EmptyMessage>Enter a Season or Tournament ID to view its published awards.</EmptyMessage>
+        <EmptyMessage>Select a Season to view its published awards.</EmptyMessage>
       )}
       {loading && <LoadingIndicator label="Loading awards…" />}
       {error && <ErrorMessage>{error}</ErrorMessage>}

@@ -1,5 +1,6 @@
-import { describe, it, expect, afterEach, vi } from 'vitest';
+﻿import { describe, it, expect, afterEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { MantineProvider } from '@mantine/core';
 import { MemoryRouter } from 'react-router-dom';
 import { SchedulePage } from './SchedulePage.js';
 import type { SchedulePayload } from '../../api/index.js';
@@ -12,19 +13,48 @@ function jsonResponse(body: unknown, status = 200): Response {
   });
 }
 
+/**
+ * Route fetch by URL so the PublicSeasonSelect's `/public/seasons` load and the
+ * page's `/public/seasons/:id/schedule` load can be stubbed independently.
+ */
+function stubFetch(schedule: SchedulePayload): void {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async (input: RequestInfo | URL) => {
+      const url = typeof input === 'string' ? input : input.toString();
+      if (url.includes('/schedule')) {
+        return jsonResponse(schedule, 200);
+      }
+      // Public Season Selector list.
+      return jsonResponse({ seasons: [{ id: 's1', name: 'Season One', closed: false }] }, 200);
+    }),
+  );
+}
+
+function renderPage(path: string): void {
+  render(
+    <MantineProvider>
+      <MemoryRouter initialEntries={[path]}>
+        <SchedulePage />
+      </MemoryRouter>
+    </MantineProvider>,
+  );
+}
+
 describe('SchedulePage', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
   });
 
-  it('prompts for a Season ID when none is selected', () => {
-    vi.stubGlobal('fetch', vi.fn());
-    render(
-      <MemoryRouter initialEntries={['/schedule']}>
-        <SchedulePage />
-      </MemoryRouter>,
+  it('prompts to select a Season when none is selected', () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        jsonResponse({ seasons: [{ id: 's1', name: 'Season One', closed: false }] }, 200),
+      ),
     );
-    expect(screen.getByText(/enter a season id/i)).toBeInTheDocument();
+    renderPage('/schedule');
+    expect(screen.getByText(/select a season/i)).toBeInTheDocument();
   });
 
   it('renders scheduled Games from the API in a table', async () => {
@@ -43,16 +73,9 @@ describe('SchedulePage', () => {
         },
       ],
     };
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () => jsonResponse(payload, 200)),
-    );
+    stubFetch(payload);
 
-    render(
-      <MemoryRouter initialEntries={['/schedule?season=s1']}>
-        <SchedulePage />
-      </MemoryRouter>,
-    );
+    renderPage('/schedule?season=s1');
 
     expect(await screen.findByText('Hawks')).toBeInTheDocument();
     expect(screen.getByText('Bulls')).toBeInTheDocument();
@@ -66,16 +89,9 @@ describe('SchedulePage', () => {
       games: [],
       message: 'No Games are scheduled for this Season.',
     };
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () => jsonResponse(payload, 200)),
-    );
+    stubFetch(payload);
 
-    render(
-      <MemoryRouter initialEntries={['/schedule?season=s1']}>
-        <SchedulePage />
-      </MemoryRouter>,
-    );
+    renderPage('/schedule?season=s1');
 
     expect(await screen.findByText(/no games are scheduled/i)).toBeInTheDocument();
   });
