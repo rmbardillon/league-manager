@@ -94,6 +94,23 @@ export interface AssignVenueAndTimeCommand {
   durationMinutes?: number;
 }
 
+/**
+ * Input for editing a draft Game's matchup and/or date (manual draft edits).
+ * Every field is optional; only the provided fields are changed. Lets a
+ * commissioner's hand-drafted schedule be adjusted: swap home/away Teams,
+ * change either Team, or move the matchup to a different date. Venue and
+ * start time are managed separately via assignVenueAndTime.
+ */
+export interface EditDraftGameCommand {
+  gameId: string;
+  /** New calendar date for the Game. */
+  date?: Date;
+  /** New home Team id. */
+  homeTeamId?: string;
+  /** New away Team id. */
+  awayTeamId?: string;
+}
+
 const DEFAULT_DURATION_MINUTES = 60;
 const DURATION_MIN_MINUTES = 1;
 const DURATION_MAX_MINUTES = 480;
@@ -371,6 +388,75 @@ export class AutomaticSchedulingService {
         { startTime: command.startTime, durationMinutes, venue },
         tx,
       );
+      if (!updated) {
+        throw new NotFoundError('Game was not found.', {
+          field: 'gameId',
+          gameId: command.gameId,
+        });
+      }
+      return updated;
+    });
+  }
+
+  /**
+   * Edit a draft Game's matchup and/or date (manual draft adjustment).
+   *
+   * Administrator-only. The Game must exist and still be in draft state; an
+   * official Game is never edited this way. Supplied Team ids are validated to
+   * be distinct and to belong to the Game's Season. A date-only edit moves the
+   * matchup; swapping both Team ids switches home and away. Only provided
+   * fields change; Venue and start time are left untouched.
+   */
+  async editDraftGame(
+    user: AuthUser,
+    command: EditDraftGameCommand,
+  ): Promise<Game> {
+    this.assertAdmin(user);
+
+    return withTransaction(this.db, async (tx) => {
+      const game = await gameRepository.findById(command.gameId, tx);
+      if (!game) {
+        throw new NotFoundError('Game was not found.', {
+          field: 'gameId',
+          gameId: command.gameId,
+        });
+      }
+      if (game.scheduleState !== 'draft') {
+        throw new ValidationError('Only a draft Game can be edited this way.', {
+          field: 'scheduleState',
+          gameId: command.gameId,
+        });
+      }
+
+      const nextHome = command.homeTeamId ?? game.homeTeamId;
+      const nextAway = command.awayTeamId ?? game.awayTeamId;
+      if (nextHome === nextAway) {
+        throw new ValidationError('The two Teams must be distinct.', {
+          field: 'awayTeamId',
+        });
+      }
+
+      const teams = await teamRepository.listBySeason(game.seasonId, tx);
+      const inSeason = new Set(teams.map((team) => team.id));
+      if (command.homeTeamId !== undefined && !inSeason.has(nextHome)) {
+        throw new NotFoundError('Team was not found in this Season.', {
+          field: 'homeTeamId',
+          teamId: nextHome,
+        });
+      }
+      if (command.awayTeamId !== undefined && !inSeason.has(nextAway)) {
+        throw new NotFoundError('Team was not found in this Season.', {
+          field: 'awayTeamId',
+          teamId: nextAway,
+        });
+      }
+
+      const patch: { date?: Date; homeTeamId?: string; awayTeamId?: string } = {};
+      if (command.date !== undefined) patch.date = command.date;
+      if (command.homeTeamId !== undefined) patch.homeTeamId = nextHome;
+      if (command.awayTeamId !== undefined) patch.awayTeamId = nextAway;
+
+      const updated = await gameRepository.update(command.gameId, patch, tx);
       if (!updated) {
         throw new NotFoundError('Game was not found.', {
           field: 'gameId',

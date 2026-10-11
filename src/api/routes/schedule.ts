@@ -36,6 +36,7 @@ import {
   readDate,
   readNumber,
   readOptionalNumber,
+  readOptionalString,
   readString,
 } from './helpers.js';
 
@@ -118,6 +119,24 @@ export function createScheduleRouter(): Router {
         venue: readString(body, 'venue'),
         startTime: readString(body, 'startTime'),
         durationMinutes: readOptionalNumber(body, 'durationMinutes'),
+      });
+      res.status(200).json(game);
+    }),
+  );
+
+  router.patch(
+    '/games/:gameId/draft',
+    authenticate(),
+    authorizeRequest('update', generationResource),
+    asyncHandler(async (req, res) => {
+      const auth = req.auth;
+      if (!auth) throw new AuthenticationError('Authentication is required.');
+      const body = readBody(req);
+      const game = await service.editDraftGame(auth.user, {
+        gameId: param(req.params.gameId),
+        date: body.date === undefined || body.date === null ? undefined : readDate(body, 'date'),
+        homeTeamId: readOptionalString(body, 'homeTeamId'),
+        awayTeamId: readOptionalString(body, 'awayTeamId'),
       });
       res.status(200).json(game);
     }),

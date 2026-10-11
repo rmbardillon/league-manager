@@ -468,6 +468,14 @@ export interface GenerateScheduleRequest {
   gamesPerDay: number;
 }
 
+/** `PATCH /games/:gameId/draft` - edit a draft Game's matchup and/or date. */
+export interface EditDraftGameRequest {
+  /** ISO date (YYYY-MM-DD). */
+  date?: string;
+  homeTeamId?: string;
+  awayTeamId?: string;
+}
+
 /** `POST /games/:gameId/assign` - assign Venue + start time to a draft Game. */
 export interface AssignVenueTimeRequest {
   venue: string;

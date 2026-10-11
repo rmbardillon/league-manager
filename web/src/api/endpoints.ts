@@ -29,6 +29,7 @@ import type {
   BatchUploadRequest,
   BatchUploadResult,
   CreateGameRequest,
+  EditDraftGameRequest,
   GameDetail,
   GameSummary,
   GenerateScheduleRequest,
@@ -428,6 +429,14 @@ export const scheduleApi = {
     return request<GameSummary>(
       `/games/${encodeURIComponent(gameId)}/assign`,
       { method: 'POST', body: input },
+    );
+  },
+
+  /** Edit a draft Game's matchup and/or date (swap teams, move date). */
+  editDraft(gameId: string, input: EditDraftGameRequest): Promise<GameSummary> {
+    return request<GameSummary>(
+      `/games/${encodeURIComponent(gameId)}/draft`,
+      { method: 'PATCH', body: input },
     );
   },
 
