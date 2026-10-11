@@ -1,21 +1,79 @@
 /**
- * Application shell: skip link, header navigation, and the main content region.
+ * Application shell: skip link, sticky NBA.com-style header with the league
+ * wordmark + horizontal nav + color-scheme toggle, and the main content region.
  *
  * Accessibility notes:
  *   - A "skip to main content" link is the first focusable element so keyboard
  *     users can bypass the navigation.
  *   - Primary navigation is a labeled `<nav>` of `NavLink`s; the active link is
- *     marked with `aria-current="page"`.
+ *     marked with `aria-current="page"` by react-router and highlighted.
  *   - The routed content renders inside a `<main id="main-content">` landmark.
  *   - The auth controls show a sign-in link when anonymous and the username
  *     plus a sign-out button when signed in.
  */
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import {
+  ActionIcon,
+  Box,
+  Button,
+  Container,
+  Group,
+  Text,
+  Tooltip,
+  useComputedColorScheme,
+  useMantineColorScheme,
+} from '@mantine/core';
 import { useAuth } from '../auth/AuthContext.js';
+import classes from './Layout.module.css';
 
 /** NavLink className callback: mark the active route for styling + a11y. */
 function navClass({ isActive }: { isActive: boolean }): string {
-  return isActive ? 'nav-link active' : 'nav-link';
+  return isActive ? `${classes.navLink} ${classes.navLinkActive}` : classes.navLink;
+}
+
+/** The primary public + management navigation targets. */
+interface NavItem {
+  to: string;
+  label: string;
+  end?: boolean;
+}
+
+const PUBLIC_LINKS: NavItem[] = [
+  { to: '/', label: 'Home', end: true },
+  { to: '/schedule', label: 'Schedule' },
+  { to: '/results', label: 'Results' },
+  { to: '/standings', label: 'Standings' },
+  { to: '/awards', label: 'Awards' },
+];
+
+const ADMIN_LINKS: NavItem[] = [
+  { to: '/manage/seasons', label: 'Seasons' },
+  { to: '/manage/teams', label: 'Teams' },
+  { to: '/manage/players', label: 'Players' },
+  { to: '/manage/roster', label: 'Roster' },
+  { to: '/manage/tournaments', label: 'Tournaments' },
+  { to: '/manage/playoffs', label: 'Playoffs' },
+  { to: '/manage/batch-upload', label: 'Batch Upload' },
+];
+
+/** A single sun/moon toggle for the light/dark color scheme. */
+function ColorSchemeToggle(): JSX.Element {
+  const { setColorScheme } = useMantineColorScheme();
+  const computed = useComputedColorScheme('dark', { getInitialValueInEffect: true });
+  const next = computed === 'dark' ? 'light' : 'dark';
+
+  return (
+    <Tooltip label={`Switch to ${next} mode`}>
+      <ActionIcon
+        variant="default"
+        size="lg"
+        aria-label={`Switch to ${next} mode`}
+        onClick={() => setColorScheme(next)}
+      >
+        <span aria-hidden="true">{computed === 'dark' ? '☀' : '☾'}</span>
+      </ActionIcon>
+    </Tooltip>
+  );
 }
 
 export function Layout(): JSX.Element {
@@ -30,95 +88,68 @@ export function Layout(): JSX.Element {
     }
   };
 
+  const links: NavItem[] = [
+    ...PUBLIC_LINKS,
+    ...(isAuthenticated ? [{ to: '/manage', label: 'Manage' }] : []),
+    ...(isAuthenticated && isAdmin ? ADMIN_LINKS : []),
+  ];
+
   return (
     <>
-      <a className="skip-link" href="#main-content">
+      <a className={classes.skipLink} href="#main-content">
         Skip to main content
       </a>
-      <header>
-        <h1>Basketball League Management</h1>
-        <nav aria-label="Primary">
-          <ul>
-            <li>
-              <NavLink to="/" end className={navClass}>
-                Home
+
+      <Box component="header" className={classes.header}>
+        <Container size="xl" className={classes.headerInner}>
+          <Group gap="sm" wrap="nowrap" className={classes.brand}>
+            <Box className={classes.brandMark} aria-hidden="true">
+              LM
+            </Box>
+            {/* h1 kept for the document outline + the app heading test. */}
+            <Text component="h1" className={classes.wordmark}>
+              Basketball League Management
+            </Text>
+          </Group>
+
+          <nav aria-label="Primary" className={classes.nav}>
+            {links.map((item) => (
+              <NavLink key={item.to} to={item.to} end={item.end} className={navClass}>
+                {item.label}
               </NavLink>
-            </li>
-            <li>
-              <NavLink to="/schedule" className={navClass}>
-                Schedule
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/results" className={navClass}>
-                Results
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/standings" className={navClass}>
-                Standings
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/awards" className={navClass}>
-                Awards
-              </NavLink>
-            </li>
-            {isAuthenticated && (
-              <li>
-                <NavLink to="/manage" className={navClass}>
-                  Manage
-                </NavLink>
-              </li>
+            ))}
+          </nav>
+
+          <Group gap="sm" wrap="nowrap" className={classes.authControls}>
+            <ColorSchemeToggle />
+            {isAuthenticated ? (
+              <>
+                <Text size="sm" c="dimmed" visibleFrom="sm">
+                  {user?.username}
+                </Text>
+                <Button
+                  variant="light"
+                  color="nba-red"
+                  size="sm"
+                  onClick={() => void handleSignOut()}
+                >
+                  Sign out
+                </Button>
+              </>
+            ) : (
+              <Button component={NavLink} to="/signin" size="sm">
+                Sign in
+              </Button>
             )}
-            {isAuthenticated && isAdmin && (
-              <li>
-                <NavLink to="/manage/teams" className={navClass}>
-                  Teams
-                </NavLink>
-              </li>
-            )}
-            {isAuthenticated && isAdmin && (
-              <li>
-                <NavLink to="/manage/seasons" className={navClass}>
-                  Seasons
-                </NavLink>
-              </li>
-            )}
-            {isAuthenticated && isAdmin && (
-              <li>
-                <NavLink to="/manage/tournaments" className={navClass}>
-                  Tournaments
-                </NavLink>
-              </li>
-            )}
-            {isAuthenticated && isAdmin && (
-              <li>
-                <NavLink to="/manage/playoffs" className={navClass}>
-                  Playoffs
-                </NavLink>
-              </li>
-            )}
-          </ul>
-        </nav>
-        <div className="auth-controls">
-          {isAuthenticated ? (
-            <>
-              <span>Signed in as {user?.username}</span>{' '}
-              <button type="button" onClick={() => void handleSignOut()}>
-                Sign out
-              </button>
-            </>
-          ) : (
-            <NavLink to="/signin" className={navClass}>
-              Sign in
-            </NavLink>
-          )}
-        </div>
-      </header>
-      <main id="main-content">
-        <Outlet />
-      </main>
+          </Group>
+        </Container>
+      </Box>
+
+      <Box component="main" id="main-content" className={classes.main}>
+        <Container size="xl">
+          <Outlet />
+        </Container>
+      </Box>
     </>
   );
 }

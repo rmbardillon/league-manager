@@ -1,0 +1,25 @@
+﻿.title {
+  text-transform: uppercase;
+  letter-spacing: rem(-0.3px);
+  border-left: rem(5px) solid var(--mantine-color-nba-blue-6);
+  padding-left: var(--mantine-spacing-sm);
+}
+
+.card {
+  text-decoration: none;
+  color: inherit;
+  transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+.card:hover {
+  transform: translateY(rem(-3px));
+  border-color: var(--mantine-color-nba-blue-5);
+  box-shadow: var(--mantine-shadow-md);
+}
+
+.cardLabel {
+  font-weight: 800;
+  font-size: rem(18px);
+  text-transform: uppercase;
+  letter-spacing: rem(0.3px);
+  color: light-dark(var(--mantine-color-dark-9), var(--mantine-color-gray-0));
+}

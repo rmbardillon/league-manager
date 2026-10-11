@@ -23,8 +23,11 @@
 import { request } from './client.js';
 import type {
   AssignPlayerRequest,
+  BatchUploadRequest,
+  BatchUploadResult,
   AuthUser,
   CreatePlayerRequest,
+  UpdatePlayerRequest,
   CreatePlayoffGameRequest,
   CreatePlayoffRoundRequest,
   CreateSeasonRequest,
@@ -255,6 +258,19 @@ export const playersApi = {
   createMaster(input: CreatePlayerRequest): Promise<Player> {
     return request<Player>('/players', { method: 'POST', body: input });
   },
+
+  /** Rename a master Player (Req 6.4). */
+  rename(playerId: string, input: UpdatePlayerRequest): Promise<Player> {
+    return request<Player>(`/players/${encodeURIComponent(playerId)}`, {
+      method: 'PATCH',
+      body: input,
+    });
+  },
+
+  /** Remove a master Player; rejected (409) when still assigned to a Team. */
+  remove(playerId: string): Promise<void> {
+    return request<void>(`/players/${encodeURIComponent(playerId)}`, { method: 'DELETE' });
+  },
 };
 
 /** Team roster and assignment management (Req 6.5, 6.8, 6.9). */
@@ -292,6 +308,17 @@ export const assignmentsApi = {
     return request<void>(
       `/teams/${encodeURIComponent(teamId)}/assignments/${encodeURIComponent(playerId)}`,
       { method: 'DELETE' },
+    );
+  },
+};
+
+/** Season-scoped Batch_Upload of Teams + Players from a CSV/.xlsx file (Req 11). */
+export const batchApi = {
+  /** Import Teams and Players into a Season from an uploaded file (Admin-only). */
+  upload(seasonId: string, input: BatchUploadRequest): Promise<BatchUploadResult> {
+    return request<BatchUploadResult>(
+      `/seasons/${encodeURIComponent(seasonId)}/batch-upload`,
+      { method: 'POST', body: input },
     );
   },
 };

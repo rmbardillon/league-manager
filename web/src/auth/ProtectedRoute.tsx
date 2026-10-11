@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Route guard for authenticated management views.
  *
  * Renders its children only for a signed-in principal; while the initial
@@ -12,6 +12,7 @@
  */
 import { Navigate, useLocation, type Location } from 'react-router-dom';
 import type { ReactNode } from 'react';
+import { Alert, Stack, Title } from '@mantine/core';
 import { useAuth } from './AuthContext.js';
 import { LoadingIndicator } from '../components/Feedback.js';
 
@@ -36,8 +37,14 @@ export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRout
   if (requireAdmin && !isAdmin) {
     return (
       <section aria-labelledby="forbidden-heading">
-        <h2 id="forbidden-heading">Not authorized</h2>
-        <p role="alert">This area requires Administrator access.</p>
+        <Stack gap="md" align="flex-start">
+          <Title order={2} id="forbidden-heading">
+            Not authorized
+          </Title>
+          <Alert role="alert" color="nba-red" variant="light" title="Administrator access required">
+            This area requires Administrator access.
+          </Alert>
+        </Stack>
       </section>
     );
   }

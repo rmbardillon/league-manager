@@ -15,5 +15,6 @@ export {
   teamsApi,
   playersApi,
   assignmentsApi,
+  batchApi,
 } from './endpoints.js';
 export type * from './types.js';

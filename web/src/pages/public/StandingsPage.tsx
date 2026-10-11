@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Public standings view (Req 10.4, 10.5, 10.6).
  *
  * Lists a Season's Standings — each row's rank, Team, wins, and losses. Open
@@ -6,10 +6,12 @@
  * the view labels for clarity (Req 10.5). No sign-in is required (Req 10.6).
  */
 import { useSearchParams } from 'react-router-dom';
+import { Badge, Card, Stack, Table, Title } from '@mantine/core';
 import { publicApi, type StandingsPayload } from '../../api/index.js';
 import { useAsync } from '../../hooks/useAsync.js';
 import { PublicSeasonSelect } from '../../components/PublicSeasonSelect.js';
 import { EmptyMessage, ErrorMessage, LoadingIndicator } from '../../components/Feedback.js';
+import pageClasses from './PublicPage.module.css';
 
 export function StandingsPage(): JSX.Element {
   const [params, setParams] = useSearchParams();
@@ -26,52 +28,58 @@ export function StandingsPage(): JSX.Element {
 
   return (
     <section aria-labelledby="standings-heading">
-      <h2 id="standings-heading">Standings</h2>
-      <PublicSeasonSelect value={seasonId || null} onChange={setSeason} id="standings-season-id" />
+      <Stack gap="lg">
+        <Title order={2} id="standings-heading" className={pageClasses.pageTitle}>
+          Standings
+        </Title>
+        <Card withBorder radius="md" padding="md" maw={420}>
+          <PublicSeasonSelect value={seasonId || null} onChange={setSeason} id="standings-season-id" />
+        </Card>
 
-      {!seasonId && <EmptyMessage>Select a Season to view its standings.</EmptyMessage>}
-      {loading && <LoadingIndicator label="Loading standings…" />}
-      {error && <ErrorMessage>{error}</ErrorMessage>}
+        {!seasonId && <EmptyMessage>Select a Season to view its standings.</EmptyMessage>}
+        {loading && <LoadingIndicator label="Loading standings…" />}
+        {error && <ErrorMessage>{error}</ErrorMessage>}
 
-      {data && data.standings.length === 0 && (
-        <EmptyMessage>
-          {data.message ?? 'No Standings are available for this Season yet.'}
-        </EmptyMessage>
-      )}
+        {data && data.standings.length === 0 && (
+          <EmptyMessage>
+            {data.message ?? 'No Standings are available for this Season yet.'}
+          </EmptyMessage>
+        )}
 
-      {data && data.standings.length > 0 && (
-        <>
-          {data.closed && (
-            <p role="status" className="badge">
-              These are the final standings recorded when the Season closed.
-            </p>
-          )}
-          <table>
-            <caption>
-              Standings for Season {data.seasonId}
-              {data.closed ? ' (final)' : ' (current)'}
-            </caption>
-            <thead>
-              <tr>
-                <th scope="col">Rank</th>
-                <th scope="col">Team</th>
-                <th scope="col">Wins</th>
-                <th scope="col">Losses</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.standings.map((row) => (
-                <tr key={row.teamId}>
-                  <td>{row.rank}</td>
-                  <td>{row.teamName || row.teamId}</td>
-                  <td>{row.wins}</td>
-                  <td>{row.losses}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </>
-      )}
+        {data && data.standings.length > 0 && (
+          <Stack gap="sm">
+            {data.closed && (
+              <Badge role="status" color="nba-red" variant="light" radius="sm" className={pageClasses.badge}>
+                Final standings recorded at season close
+              </Badge>
+            )}
+            <Card withBorder radius="md" padding={0} className={pageClasses.tableCard}>
+              <Table.ScrollContainer minWidth={520}>
+                <Table>
+                  <Table.Thead>
+                    <Table.Tr>
+                      <Table.Th>Rank</Table.Th>
+                      <Table.Th>Team</Table.Th>
+                      <Table.Th>Wins</Table.Th>
+                      <Table.Th>Losses</Table.Th>
+                    </Table.Tr>
+                  </Table.Thead>
+                  <Table.Tbody>
+                    {data.standings.map((row) => (
+                      <Table.Tr key={row.teamId}>
+                        <Table.Td fw={700}>{row.rank}</Table.Td>
+                        <Table.Td>{row.teamName || row.teamId}</Table.Td>
+                        <Table.Td>{row.wins}</Table.Td>
+                        <Table.Td>{row.losses}</Table.Td>
+                      </Table.Tr>
+                    ))}
+                  </Table.Tbody>
+                </Table>
+              </Table.ScrollContainer>
+            </Card>
+          </Stack>
+        )}
+      </Stack>
     </section>
   );
 }

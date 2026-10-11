@@ -1,6 +1,7 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { MantineProvider } from '@mantine/core';
 import { SignInPage } from './SignInPage.js';
 import { AuthProvider } from '../auth/AuthContext.js';
 import type { AuthUser } from '../api/index.js';
@@ -15,14 +16,16 @@ function jsonResponse(body: unknown, status = 200): Response {
 /** Render the sign-in page inside auth + router, with a target for redirects. */
 function renderSignIn(): void {
   render(
-    <AuthProvider>
-      <MemoryRouter initialEntries={['/signin']}>
-        <Routes>
-          <Route path="/signin" element={<SignInPage />} />
-          <Route path="/manage" element={<h2>Management</h2>} />
-        </Routes>
-      </MemoryRouter>
-    </AuthProvider>,
+    <MantineProvider>
+      <AuthProvider>
+        <MemoryRouter initialEntries={['/signin']}>
+          <Routes>
+            <Route path="/signin" element={<SignInPage />} />
+            <Route path="/manage" element={<h2>Management</h2>} />
+          </Routes>
+        </MemoryRouter>
+      </AuthProvider>
+    </MantineProvider>,
   );
 }
 

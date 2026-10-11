@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Public results view (Req 10.3, 10.6).
  *
  * Lists a Season's completed Games with both Teams' final Scores and the date
@@ -6,10 +6,12 @@
  * set renders the informational message rather than an error.
  */
 import { useSearchParams } from 'react-router-dom';
+import { Card, Stack, Table, Title } from '@mantine/core';
 import { publicApi, type ResultsPayload } from '../../api/index.js';
 import { useAsync } from '../../hooks/useAsync.js';
 import { PublicSeasonSelect } from '../../components/PublicSeasonSelect.js';
 import { EmptyMessage, ErrorMessage, LoadingIndicator } from '../../components/Feedback.js';
+import pageClasses from './PublicPage.module.css';
 
 /** Format an ISO timestamp as a local calendar date for display. */
 function formatDate(iso: string): string {
@@ -32,44 +34,53 @@ export function ResultsPage(): JSX.Element {
 
   return (
     <section aria-labelledby="results-heading">
-      <h2 id="results-heading">Results</h2>
-      <PublicSeasonSelect value={seasonId || null} onChange={setSeason} id="results-season-id" />
+      <Stack gap="lg">
+        <Title order={2} id="results-heading" className={pageClasses.pageTitle}>
+          Results
+        </Title>
+        <Card withBorder radius="md" padding="md" maw={420}>
+          <PublicSeasonSelect value={seasonId || null} onChange={setSeason} id="results-season-id" />
+        </Card>
 
-      {!seasonId && <EmptyMessage>Select a Season to view its results.</EmptyMessage>}
-      {loading && <LoadingIndicator label="Loading results…" />}
-      {error && <ErrorMessage>{error}</ErrorMessage>}
+        {!seasonId && <EmptyMessage>Select a Season to view its results.</EmptyMessage>}
+        {loading && <LoadingIndicator label="Loading results…" />}
+        {error && <ErrorMessage>{error}</ErrorMessage>}
 
-      {data && data.games.length === 0 && (
-        <EmptyMessage>
-          {data.message ?? 'No completed Games are available for this Season yet.'}
-        </EmptyMessage>
-      )}
+        {data && data.games.length === 0 && (
+          <EmptyMessage>
+            {data.message ?? 'No completed Games are available for this Season yet.'}
+          </EmptyMessage>
+        )}
 
-      {data && data.games.length > 0 && (
-        <table>
-          <caption>Completed Games for Season {data.seasonId}</caption>
-          <thead>
-            <tr>
-              <th scope="col">Home</th>
-              <th scope="col">Score</th>
-              <th scope="col">Away</th>
-              <th scope="col">Score</th>
-              <th scope="col">Completed</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.games.map((game) => (
-              <tr key={game.gameId}>
-                <td>{game.homeTeamName || game.homeTeamId}</td>
-                <td>{game.homeScore}</td>
-                <td>{game.awayTeamName || game.awayTeamId}</td>
-                <td>{game.awayScore}</td>
-                <td>{formatDate(game.completedAt)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+        {data && data.games.length > 0 && (
+          <Card withBorder radius="md" padding={0} className={pageClasses.tableCard}>
+            <Table.ScrollContainer minWidth={640}>
+              <Table>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>Home</Table.Th>
+                    <Table.Th>Score</Table.Th>
+                    <Table.Th>Away</Table.Th>
+                    <Table.Th>Score</Table.Th>
+                    <Table.Th>Completed</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {data.games.map((game) => (
+                    <Table.Tr key={game.gameId}>
+                      <Table.Td>{game.homeTeamName || game.homeTeamId}</Table.Td>
+                      <Table.Td fw={700}>{game.homeScore}</Table.Td>
+                      <Table.Td>{game.awayTeamName || game.awayTeamId}</Table.Td>
+                      <Table.Td fw={700}>{game.awayScore}</Table.Td>
+                      <Table.Td>{formatDate(game.completedAt)}</Table.Td>
+                    </Table.Tr>
+                  ))}
+                </Table.Tbody>
+              </Table>
+            </Table.ScrollContainer>
+          </Card>
+        )}
+      </Stack>
     </section>
   );
 }

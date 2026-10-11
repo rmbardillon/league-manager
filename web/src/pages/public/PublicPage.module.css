@@ -1,0 +1,14 @@
+﻿.pageTitle {
+  text-transform: uppercase;
+  letter-spacing: rem(-0.3px);
+  border-left: rem(5px) solid var(--mantine-color-nba-red-6);
+  padding-left: var(--mantine-spacing-sm);
+}
+
+.tableCard {
+  overflow: hidden;
+}
+
+.badge {
+  width: fit-content;
+}

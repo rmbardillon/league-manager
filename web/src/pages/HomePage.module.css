@@ -1,0 +1,53 @@
+﻿.hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--mantine-radius-lg);
+  padding: clamp(2rem, 5vw, 4rem);
+  color: #fff;
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgba(248, 36, 61, 0.55), transparent 55%),
+    linear-gradient(135deg, var(--mantine-color-nba-blue-9), var(--mantine-color-nba-blue-6));
+}
+
+.heroInner {
+  position: relative;
+  max-width: rem(640px);
+}
+
+.heroTitle {
+  font-size: clamp(1.8rem, 4.5vw, 3rem);
+  font-weight: 800;
+  letter-spacing: rem(-0.5px);
+  color: #fff;
+}
+
+.heroText {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.sectionLabel {
+  text-transform: uppercase;
+  letter-spacing: rem(1px);
+  font-weight: 800;
+  font-size: rem(13px);
+  color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-gray-5));
+}
+
+.tile {
+  text-decoration: none;
+  color: inherit;
+  transition: transform 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+}
+.tile:hover {
+  transform: translateY(rem(-3px));
+  border-color: var(--mantine-color-nba-blue-5);
+  box-shadow: var(--mantine-shadow-md);
+}
+
+.tileLabel {
+  font-weight: 800;
+  font-size: rem(18px);
+  text-transform: uppercase;
+  letter-spacing: rem(0.3px);
+  color: light-dark(var(--mantine-color-dark-9), var(--mantine-color-gray-0));
+}

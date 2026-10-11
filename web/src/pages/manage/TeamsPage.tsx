@@ -358,7 +358,7 @@ export function TeamsPage(): JSX.Element {
                                 size="xs"
                                 variant="subtle"
                                 component={Link}
-                                to={`/manage/players?team=${encodeURIComponent(team.id)}`}
+                                to={`/manage/roster?team=${encodeURIComponent(team.id)}`}
                               >
                                 Manage roster
                               </Button>

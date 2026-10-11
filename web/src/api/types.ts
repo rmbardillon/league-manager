@@ -164,6 +164,28 @@ export interface CreatePlayerRequest {
   name: string;
 }
 
+/** `PATCH /players/:playerId` - rename a master Player. */
+export interface UpdatePlayerRequest {
+  name: string;
+}
+
+/** `POST /seasons/:seasonId/batch-upload` - import Teams + Players from a file. */
+export interface BatchUploadRequest {
+  /** The uploaded file bytes, base64-encoded. */
+  fileBase64: string;
+  /** Original filename (its extension drives CSV/.xlsx detection). */
+  filename: string;
+  /** MIME type reported by the browser, if any. */
+  mimeType?: string;
+}
+
+/** Confirmation returned by a successful Batch_Upload. */
+export interface BatchUploadResult {
+  teamsCreated: number;
+  playersCreated: number;
+  importedRecords: number;
+}
+
 /** `POST /teams/:teamId/assignments` — assign a master Player to a Team. */
 export interface AssignPlayerRequest {
   playerId: string;

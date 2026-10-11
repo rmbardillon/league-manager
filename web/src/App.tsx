@@ -22,6 +22,9 @@
  *   - `*`            not-found fallback
  */
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { MantineProvider } from '@mantine/core';
+import { Notifications } from '@mantine/notifications';
+import { theme } from './theme.js';
 import { AuthProvider } from './auth/AuthContext.js';
 import { ProtectedRoute } from './auth/ProtectedRoute.js';
 import { Layout } from './components/Layout.js';
@@ -35,9 +38,11 @@ import { AwardsPage } from './pages/public/AwardsPage.js';
 import { ManageHome } from './pages/manage/ManageHome.js';
 import { TeamsPage } from './pages/manage/TeamsPage.js';
 import { PlayersPage } from './pages/manage/PlayersPage.js';
+import { PlayersRegistryPage } from './pages/manage/PlayersRegistryPage.js';
 import { SeasonsPage } from './pages/manage/SeasonsPage.js';
 import { TournamentsPage } from './pages/manage/TournamentsPage.js';
 import { PlayoffsPage } from './pages/manage/PlayoffsPage.js';
+import { BatchUploadPage } from './pages/manage/BatchUploadPage.js';
 
 /** The route table, router-agnostic so it can be mounted in tests. */
 export function AppRoutes(): JSX.Element {
@@ -69,6 +74,14 @@ export function AppRoutes(): JSX.Element {
         <Route
           path="manage/players"
           element={
+            <ProtectedRoute requireAdmin>
+              <PlayersRegistryPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="manage/roster"
+          element={
             <ProtectedRoute>
               <PlayersPage />
             </ProtectedRoute>
@@ -98,6 +111,14 @@ export function AppRoutes(): JSX.Element {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="manage/batch-upload"
+          element={
+            <ProtectedRoute requireAdmin>
+              <BatchUploadPage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
@@ -107,10 +128,13 @@ export function AppRoutes(): JSX.Element {
 /** Composition root: auth + router + routes. */
 export function App(): JSX.Element {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
-    </AuthProvider>
+    <MantineProvider theme={theme} defaultColorScheme="dark">
+      <Notifications position="top-right" />
+      <AuthProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </AuthProvider>
+    </MantineProvider>
   );
 }

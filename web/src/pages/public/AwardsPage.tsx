@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Public awards view (Req 13.15).
  *
  * Shows the published Awards for a scope (Season or Tournament). Viewers see
@@ -9,6 +9,7 @@
  * scope id, since a Season is the common scope) so the view is deep-linkable.
  */
 import { useSearchParams } from 'react-router-dom';
+import { Card, List, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import {
   publicApi,
   type AwardCategory,
@@ -17,6 +18,7 @@ import {
 import { useAsync } from '../../hooks/useAsync.js';
 import { PublicSeasonSelect } from '../../components/PublicSeasonSelect.js';
 import { EmptyMessage, ErrorMessage, LoadingIndicator } from '../../components/Feedback.js';
+import pageClasses from './PublicPage.module.css';
 
 /** Human-readable labels for each Award category. */
 const CATEGORY_LABELS: Record<AwardCategory, string> = {
@@ -43,42 +45,52 @@ export function AwardsPage(): JSX.Element {
 
   return (
     <section aria-labelledby="awards-heading">
-      <h2 id="awards-heading">Published Awards</h2>
-      <PublicSeasonSelect
-        value={scopeId || null}
-        onChange={setScope}
-        label="Season"
-        id="awards-scope-id"
-      />
+      <Stack gap="lg">
+        <Title order={2} id="awards-heading" className={pageClasses.pageTitle}>
+          Published Awards
+        </Title>
+        <Card withBorder radius="md" padding="md" maw={420}>
+          <PublicSeasonSelect
+            value={scopeId || null}
+            onChange={setScope}
+            label="Season"
+            id="awards-scope-id"
+          />
+        </Card>
 
-      {!scopeId && (
-        <EmptyMessage>Select a Season to view its published awards.</EmptyMessage>
-      )}
-      {loading && <LoadingIndicator label="Loading awards…" />}
-      {error && <ErrorMessage>{error}</ErrorMessage>}
+        {!scopeId && (
+          <EmptyMessage>Select a Season to view its published awards.</EmptyMessage>
+        )}
+        {loading && <LoadingIndicator label="Loading awards…" />}
+        {error && <ErrorMessage>{error}</ErrorMessage>}
 
-      {data && data.awards.length === 0 && (
-        <EmptyMessage>{data.message ?? 'No awards have been published yet.'}</EmptyMessage>
-      )}
+        {data && data.awards.length === 0 && (
+          <EmptyMessage>{data.message ?? 'No awards have been published yet.'}</EmptyMessage>
+        )}
 
-      {data && data.awards.length > 0 && (
-        <ul className="awards-list">
-          {data.awards.map((award) => (
-            <li key={award.id}>
-              <h3>{CATEGORY_LABELS[award.category]}</h3>
-              {award.playerIds.length === 1 ? (
-                <p>Player: {award.playerIds[0]}</p>
-              ) : (
-                <ol>
-                  {award.playerIds.map((playerId) => (
-                    <li key={playerId}>{playerId}</li>
-                  ))}
-                </ol>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
+        {data && data.awards.length > 0 && (
+          <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="md">
+            {data.awards.map((award) => (
+              <Card key={award.id} withBorder radius="md" padding="lg">
+                <Stack gap="xs">
+                  <Text className={pageClasses.pageTitle} fw={800} fz="h3" style={{ border: 0, padding: 0 }}>
+                    {CATEGORY_LABELS[award.category]}
+                  </Text>
+                  {award.playerIds.length === 1 ? (
+                    <Text>{award.playerIds[0]}</Text>
+                  ) : (
+                    <List type="ordered" withPadding>
+                      {award.playerIds.map((playerId) => (
+                        <List.Item key={playerId}>{playerId}</List.Item>
+                      ))}
+                    </List>
+                  )}
+                </Stack>
+              </Card>
+            ))}
+          </SimpleGrid>
+        )}
+      </Stack>
     </section>
   );
 }
