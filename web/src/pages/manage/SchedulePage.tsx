@@ -1,21 +1,20 @@
 /**
- * Automatic schedule management page (Manage > Schedule) - Requirement 12,
- * with manual draft adjustment.
+ * Schedule management page (Manage > Schedule) - Requirement 12 + manual edits.
  *
- * Workflow for an Administrator:
- *   1. Generate a round-robin Draft_Schedule for a Season (date range, playable
- *      weekdays, single/double, per-day cap). `scheduleApi.generate`.
- *   2. Adjust the draft by hand - the common case where a commissioner drafts a
- *      schedule and the admin tweaks it:
- *        - swap or change each game's Home/Away team (`scheduleApi.editDraft`);
- *        - move a game to a different date (`scheduleApi.editDraft`);
- *        - set a venue + start time per game, or set defaults once and apply to
- *          every draft game at once (`scheduleApi.assign`).
- *   3. Regenerate to rebuild from scratch, or Submit to make the draft official
- *      and visible to Viewers (`scheduleApi.submit`).
+ * Picking a League + Season loads the Season''s FULL schedule - both the draft
+ * (not-yet-submitted) games and the submitted (official) games - and makes them
+ * editable in place:
+ *   - Draft games: generate/regenerate a round-robin draft, set a default venue
+ *     and staggered times, edit each game''s date / home / away, and submit.
+ *   - Submitted (official) games: still editable - change date, swap/change the
+ *     teams, and set venue/time - as long as the game has not been played.
+ *     Completed and cancelled games are read-only here (correct a completed
+ *     game''s score on the Games page instead).
  *
- * Draft games are hidden from the public Schedule until submitted. The whole
- * page is gated to Administrators by the route guard.
+ * Editing date/teams uses the general game-edit endpoint (works for draft and
+ * official-but-scheduled games). Venue/time uses the draft-assign endpoint for
+ * draft games and the reschedule endpoint for official games. The whole page is
+ * gated to Administrators by the route guard.
  */
 import { useCallback, useMemo, useState } from 'react';
 import {
@@ -26,6 +25,7 @@ import {
   Card,
   Checkbox,
   Group,
+  Modal,
   NumberInput,
   Select,
   Stack,
@@ -66,6 +66,22 @@ function messageFor(error: unknown, fallback: string): string {
   return error instanceof ApiError ? error.message : fallback;
 }
 
+function parseHm(hm: string): number | null {
+  const m = /^(\d{1,2}):(\d{2})$/.exec(hm.trim());
+  if (m === null) return null;
+  const h = Number(m[1]);
+  const min = Number(m[2]);
+  if (h < 0 || h > 23 || min < 0 || min > 59) return null;
+  return h * 60 + min;
+}
+
+function toHm(mins: number): string {
+  const clamped = ((mins % 1440) + 1440) % 1440;
+  const h = Math.floor(clamped / 60);
+  const min = clamped % 60;
+  return `${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+}
+
 interface GenerateValues {
   startDate: string;
   endDate: string;
@@ -80,6 +96,12 @@ interface DefaultValues {
   durationMinutes: number | string;
 }
 
+interface VenueTimeValues {
+  venue: string;
+  startTime: string;
+  durationMinutes: number | string;
+}
+
 export function SchedulePage(): JSX.Element {
   const [leagueId, setLeagueId] = useState<string | null>(null);
   const [seasonId, setSeasonId] = useState<string | null>(null);
@@ -87,6 +109,7 @@ export function SchedulePage(): JSX.Element {
   const [submitting, setSubmitting] = useState(false);
   const [busyRow, setBusyRow] = useState<string | null>(null);
   const [applyingAll, setApplyingAll] = useState(false);
+  const [venueTarget, setVenueTarget] = useState<GameSummary | null>(null);
 
   const listKey = seasonId !== null ? `/seasons/${seasonId}/games` : null;
   const loader = useCallback(
@@ -104,7 +127,10 @@ export function SchedulePage(): JSX.Element {
     () => items.filter((g) => g.scheduleState === 'draft'),
     [items],
   );
-  const officialCount = items.length - draftGames.length;
+  const officialGames = useMemo(
+    () => items.filter((g) => g.scheduleState === 'official'),
+    [items],
+  );
 
   const form = useForm<GenerateValues>({
     initialValues: {
@@ -133,6 +159,14 @@ export function SchedulePage(): JSX.Element {
   const defaults = useForm<DefaultValues>({
     initialValues: { venue: '', startTime: '18:00', durationMinutes: 60 },
     validate: {
+      startTime: (v) => (/^\d{1,2}:\d{2}$/.test(v.trim()) ? null : 'Use HH:MM (24-hour).'),
+    },
+  });
+
+  const venueForm = useForm<VenueTimeValues>({
+    initialValues: { venue: '', startTime: '', durationMinutes: 60 },
+    validate: {
+      venue: (v) => (v.trim() === '' ? 'Enter a venue.' : null),
       startTime: (v) => (/^\d{1,2}:\d{2}$/.test(v.trim()) ? null : 'Use HH:MM (24-hour).'),
     },
   });
@@ -176,8 +210,8 @@ export function SchedulePage(): JSX.Element {
     void runGenerate(draftGames.length > 0 ? 'regenerate' : 'generate', values);
   });
 
-  /** Edit a draft game's matchup/date; refreshes on success. */
-  const editDraft = useCallback(
+  /** Edit a game's matchup/date (works for draft and official-scheduled). */
+  const editGame = useCallback(
     async (
       game: GameSummary,
       patch: { date?: string; homeTeamId?: string; awayTeamId?: string },
@@ -187,12 +221,12 @@ export function SchedulePage(): JSX.Element {
       try {
         await scheduleApi.editDraft(game.id, patch);
         refresh();
-        notifications.show({ color: 'green', title: 'Draft updated', message: successMessage });
+        notifications.show({ color: 'green', title: 'Schedule updated', message: successMessage });
       } catch (err: unknown) {
         notifications.show({
           color: 'red',
-          title: 'Could not update the draft',
-          message: messageFor(err, 'Failed to update the draft game.'),
+          title: 'Could not update the game',
+          message: messageFor(err, 'Failed to update the game.'),
         });
       } finally {
         setBusyRow(null);
@@ -203,74 +237,94 @@ export function SchedulePage(): JSX.Element {
 
   const swapTeams = useCallback(
     (game: GameSummary) =>
-      void editDraft(
+      void editGame(
         game,
         { homeTeamId: game.awayTeamId, awayTeamId: game.homeTeamId },
         'Home and away swapped.',
       ),
-    [editDraft],
+    [editGame],
   );
 
   const changeTeam = useCallback(
     (game: GameSummary, side: 'home' | 'away', teamId: string | null) => {
       if (teamId === null) return;
       const patch = side === 'home' ? { homeTeamId: teamId } : { awayTeamId: teamId };
-      void editDraft(game, patch, 'Team changed.');
+      void editGame(game, patch, 'Team changed.');
     },
-    [editDraft],
+    [editGame],
   );
 
   const changeDate = useCallback(
     (game: GameSummary, date: string) => {
       if (date.trim() === '') return;
-      void editDraft(game, { date }, 'Date updated.');
+      void editGame(game, { date }, 'Date updated.');
     },
-    [editDraft],
+    [editGame],
   );
 
-  /** Parse "HH:MM" to minutes from midnight, or null when malformed. */
-  const parseHm = (hm: string): number | null => {
-    const m = /^(\d{1,2}):(\d{2})$/.exec(hm.trim());
-    if (m === null) return null;
-    const h = Number(m[1]);
-    const min = Number(m[2]);
-    if (h < 0 || h > 23 || min < 0 || min > 59) return null;
-    return h * 60 + min;
-  };
-
-  /** Format minutes-from-midnight back to "HH:MM" (24-hour). */
-  const toHm = (mins: number): string => {
-    const clamped = ((mins % 1440) + 1440) % 1440;
-    const h = Math.floor(clamped / 60);
-    const min = clamped % 60;
-    return `${String(h).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
-  };
-
-  /** Assign one draft game a specific start time at the default venue. */
-  const assignAt = useCallback(
-    async (game: GameSummary, startTime: string, silent: boolean): Promise<boolean> => {
+  /** Assign/update venue+time, routing to the right endpoint per state. */
+  const saveVenueTime = useCallback(
+    async (game: GameSummary, v: VenueTimeValues, silent: boolean): Promise<boolean> => {
+      const venue = v.venue.trim();
+      const startTime = v.startTime.trim();
+      const durationMinutes = Number(v.durationMinutes);
       try {
-        await scheduleApi.assign(game.id, {
-          venue: defaults.values.venue.trim(),
-          startTime,
-          durationMinutes: Number(defaults.values.durationMinutes),
-        });
+        if (game.scheduleState === 'draft') {
+          await scheduleApi.assign(game.id, { venue, startTime, durationMinutes });
+        } else {
+          // Official game: reschedule carries date + venue + time together.
+          await gamesApi.reschedule(game.id, {
+            date: game.date.slice(0, 10),
+            startTime,
+            durationMinutes,
+            venue,
+          });
+        }
         return true;
       } catch (err: unknown) {
         if (!silent) {
           notifications.show({
             color: 'red',
-            title: 'Could not assign',
-            message: messageFor(err, 'Failed to assign venue and time.'),
+            title: 'Could not set venue and time',
+            message: messageFor(err, 'Failed to set venue and time.'),
           });
         }
         return false;
       }
     },
-    [defaults],
+    [],
   );
 
-  /** Validate the default venue + start time; returns the base minutes or null. */
+  const openVenue = useCallback(
+    (game: GameSummary) => {
+      setVenueTarget(game);
+      venueForm.setValues({
+        venue: game.venue ?? defaults.values.venue,
+        startTime: game.startTime ?? defaults.values.startTime,
+        durationMinutes: game.durationMinutes ?? defaults.values.durationMinutes,
+      });
+      venueForm.clearErrors();
+    },
+    [venueForm, defaults.values],
+  );
+
+  const closeVenue = useCallback(() => {
+    setVenueTarget(null);
+    venueForm.reset();
+  }, [venueForm]);
+
+  const handleVenueSave = venueForm.onSubmit(async (values) => {
+    if (venueTarget === null) return;
+    setBusyRow(venueTarget.id);
+    const ok = await saveVenueTime(venueTarget, values, false);
+    setBusyRow(null);
+    if (ok) {
+      refresh();
+      closeVenue();
+      notifications.show({ color: 'green', title: 'Saved', message: 'Venue and time set.' });
+    }
+  });
+
   const validateDefaults = useCallback((): number | null => {
     const venue = defaults.values.venue.trim();
     const base = parseHm(defaults.values.startTime);
@@ -285,35 +339,19 @@ export function SchedulePage(): JSX.Element {
     return base;
   }, [defaults]);
 
-  /** Apply the default venue to one game at the default start time. */
-  const applyToOne = useCallback(
-    async (game: GameSummary) => {
-      const base = validateDefaults();
-      if (base === null) return;
-      setBusyRow(game.id);
-      const ok = await assignAt(game, defaults.values.startTime.trim(), false);
-      setBusyRow(null);
-      if (ok) {
-        refresh();
-        notifications.show({ color: 'green', title: 'Assigned', message: 'Venue and time set.' });
-      }
-    },
-    [validateDefaults, assignAt, defaults, refresh],
-  );
-
   /**
-   * Apply the default venue to every draft game, staggering start times per
-   * date: the first game on a date starts at the default time, each later game
-   * on the same date starts one duration after the previous (so 2+ games per
-   * day at one venue run back-to-back instead of conflicting).
+   * Apply the default venue to every DRAFT game, staggering start times per
+   * date: the first game on a date starts at the default time; each later game
+   * that day starts one duration after the previous (so 2+ games per day at one
+   * venue run back-to-back instead of conflicting).
    */
   const applyToAll = useCallback(async () => {
     const base = validateDefaults();
     if (base === null) return;
     const duration = Number(defaults.values.durationMinutes);
+    const venue = defaults.values.venue.trim();
     setApplyingAll(true);
 
-    // Group draft games by calendar date (YYYY-MM-DD), preserving list order.
     const byDate = new Map<string, GameSummary[]>();
     for (const game of draftGames) {
       const day = game.date.slice(0, 10);
@@ -325,10 +363,13 @@ export function SchedulePage(): JSX.Element {
     let ok = 0;
     let failed = 0;
     for (const bucket of byDate.values()) {
-      // Sequential within a date so each slot is base + n*duration.
       for (let i = 0; i < bucket.length; i += 1) {
         const slot = toHm(base + i * duration);
-        const success = await assignAt(bucket[i]!, slot, true);
+        const success = await saveVenueTime(
+          bucket[i]!,
+          { venue, startTime: slot, durationMinutes: duration },
+          true,
+        );
         if (success) ok += 1;
         else failed += 1;
       }
@@ -344,10 +385,141 @@ export function SchedulePage(): JSX.Element {
           ? `Set venue and staggered times on ${ok} game(s).`
           : `Set ${ok} game(s); ${failed} could not be set (venue/time conflicts) - adjust those individually.`,
     });
-  }, [validateDefaults, defaults, draftGames, assignAt, refresh]);
+  }, [validateDefaults, defaults, draftGames, saveVenueTime, refresh]);
 
   const unassignedDrafts = draftGames.filter((g) => g.venue === null || g.startTime === null).length;
   const hasSeason = seasonId !== null;
+
+  function handleSubmit(): void {
+    if (seasonId === null) return;
+    setSubmitting(true);
+    scheduleApi
+      .submit(seasonId)
+      .then((res) => {
+        refresh();
+        notifications.show({
+          color: 'green',
+          title: 'Schedule submitted',
+          message: `${res.games.length} game(s) are now official.`,
+        });
+      })
+      .catch((err: unknown) => {
+        notifications.show({
+          color: 'red',
+          title: 'Could not submit',
+          message: messageFor(err, 'Failed to submit the schedule.'),
+        });
+      })
+      .finally(() => setSubmitting(false));
+  }
+
+  /** Render an editable games table for a set of games (draft or official). */
+  function renderEditableTable(rows: GameSummary[]): JSX.Element {
+    return (
+      <Card withBorder radius="md" padding={0}>
+        <Table.ScrollContainer minWidth={940}>
+          <Table verticalSpacing="xs">
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>Date</Table.Th>
+                <Table.Th>Home</Table.Th>
+                <Table.Th>Swap</Table.Th>
+                <Table.Th>Away</Table.Th>
+                <Table.Th>Venue / time</Table.Th>
+                <Table.Th>Status</Table.Th>
+                <Table.Th>Actions</Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {rows.map((game) => {
+                const rowBusy = busyRow === game.id;
+                const locked = game.status === 'completed' || game.status === 'cancelled';
+                return (
+                  <Table.Tr key={game.id}>
+                    <Table.Td>
+                      <TextInput
+                        type="date"
+                        size="xs"
+                        aria-label="Game date"
+                        defaultValue={game.date.slice(0, 10)}
+                        onBlur={(e) => {
+                          const v = e.currentTarget.value;
+                          if (v && v !== game.date.slice(0, 10)) changeDate(game, v);
+                        }}
+                        disabled={rowBusy || locked}
+                      />
+                    </Table.Td>
+                    <Table.Td miw={160}>
+                      <TeamSelect
+                        seasonId={seasonId}
+                        value={game.homeTeamId}
+                        onChange={(id) => changeTeam(game, 'home', id)}
+                        label=""
+                        disabled={rowBusy || locked}
+                      />
+                    </Table.Td>
+                    <Table.Td>
+                      <Tooltip label="Swap home and away">
+                        <ActionIcon
+                          variant="light"
+                          aria-label="Swap home and away"
+                          onClick={() => swapTeams(game)}
+                          disabled={rowBusy || locked}
+                        >
+                          <span aria-hidden="true">&#8646;</span>
+                        </ActionIcon>
+                      </Tooltip>
+                    </Table.Td>
+                    <Table.Td miw={160}>
+                      <TeamSelect
+                        seasonId={seasonId}
+                        value={game.awayTeamId}
+                        onChange={(id) => changeTeam(game, 'away', id)}
+                        label=""
+                        disabled={rowBusy || locked}
+                      />
+                    </Table.Td>
+                    <Table.Td>
+                      {game.venue && game.startTime ? (
+                        `${game.venue} @ ${game.startTime}`
+                      ) : (
+                        <Text c="dimmed" size="sm">unassigned</Text>
+                      )}
+                    </Table.Td>
+                    <Table.Td>
+                      <Badge
+                        variant="light"
+                        radius="sm"
+                        color={
+                          game.status === 'completed'
+                            ? 'green'
+                            : game.status === 'cancelled'
+                              ? 'gray'
+                              : 'nba-blue'
+                        }
+                      >
+                        {game.status}
+                      </Badge>
+                    </Table.Td>
+                    <Table.Td>
+                      <Button
+                        size="xs"
+                        variant="light"
+                        onClick={() => openVenue(game)}
+                        disabled={rowBusy || locked}
+                      >
+                        Venue/time
+                      </Button>
+                    </Table.Td>
+                  </Table.Tr>
+                );
+              })}
+            </Table.Tbody>
+          </Table>
+        </Table.ScrollContainer>
+      </Card>
+    );
+  }
 
   return (
     <section aria-labelledby="autosched-heading">
@@ -369,6 +541,16 @@ export function SchedulePage(): JSX.Element {
 
         {hasSeason ? (
           <>
+            {error !== null ? (
+              <Alert role="alert" color="nba-red" title="Failed to load schedule">
+                <Stack gap="xs" align="flex-start">
+                  <Text size="sm">{error}</Text>
+                  <Button size="xs" variant="light" onClick={reload}>Retry</Button>
+                </Stack>
+              </Alert>
+            ) : null}
+            {loading ? <Text role="status">Loading schedule...</Text> : null}
+
             <Card withBorder radius="md" padding="lg" maw={520}>
               <Stack gap="sm">
                 <Title order={3}>Generate a draft schedule</Title>
@@ -414,7 +596,7 @@ export function SchedulePage(): JSX.Element {
             {draftGames.length > 0 ? (
               <Card withBorder radius="md" padding="lg" maw={520}>
                 <Stack gap="sm">
-                  <Title order={3}>Default venue &amp; time</Title>
+                  <Title order={3}>Default venue &amp; time (drafts)</Title>
                   <Text size="sm" c="dimmed">
                     Set these once, then apply to every draft game. Games on the
                     same date are staggered: the first starts at the start time and
@@ -434,164 +616,72 @@ export function SchedulePage(): JSX.Element {
               </Card>
             ) : null}
 
-            <section aria-labelledby="draft-list-heading">
+            {draftGames.length > 0 ? (
+              <section aria-labelledby="draft-list-heading">
+                <Stack gap="sm">
+                  <Group justify="space-between" align="flex-end">
+                    <Title id="draft-list-heading" order={3}>Draft games (not submitted)</Title>
+                    <Button
+                      onClick={handleSubmit}
+                      loading={submitting}
+                      disabled={unassignedDrafts > 0}
+                    >
+                      Submit schedule
+                    </Button>
+                  </Group>
+                  {unassignedDrafts > 0 ? (
+                    <Text size="sm" c="dimmed">
+                      Assign a venue and start time to all {unassignedDrafts} unassigned draft
+                      game(s) before submitting.
+                    </Text>
+                  ) : null}
+                  {renderEditableTable(draftGames)}
+                </Stack>
+              </section>
+            ) : null}
+
+            <section aria-labelledby="official-list-heading">
               <Stack gap="sm">
-                <Group justify="space-between" align="flex-end">
-                  <Title id="draft-list-heading" order={3}>Draft games</Title>
-                  <Button
-                    onClick={() => void handleSubmit()}
-                    loading={submitting}
-                    disabled={draftGames.length === 0 || unassignedDrafts > 0}
-                  >
-                    Submit schedule
-                  </Button>
-                </Group>
-
-                {officialCount > 0 ? (
-                  <Badge color="green" variant="light" radius="sm" style={{ width: 'fit-content' }}>
-                    {officialCount} official game(s) already submitted
-                  </Badge>
-                ) : null}
-                {draftGames.length > 0 && unassignedDrafts > 0 ? (
-                  <Text size="sm" c="dimmed">
-                    Assign a venue and start time to all {unassignedDrafts} unassigned draft game(s)
-                    before submitting.
-                  </Text>
-                ) : null}
-
-                {error !== null ? (
-                  <Alert role="alert" color="nba-red" title="Failed to load games">
-                    <Stack gap="xs" align="flex-start">
-                      <Text size="sm">{error}</Text>
-                      <Button size="xs" variant="light" onClick={reload}>Retry</Button>
-                    </Stack>
-                  </Alert>
-                ) : null}
-                {loading ? <Text role="status">Loading draft...</Text> : null}
-                {!loading && error === null && draftGames.length === 0 ? (
+                <Title id="official-list-heading" order={3}>Submitted schedule (official)</Title>
+                {officialGames.length === 0 ? (
                   <Text role="status" c="dimmed">
-                    No draft games. Generate a draft above.
+                    No official games yet. Generate a draft above and submit it.
                   </Text>
-                ) : null}
-
-                {draftGames.length > 0 ? (
-                  <Card withBorder radius="md" padding={0}>
-                    <Table.ScrollContainer minWidth={900}>
-                      <Table verticalSpacing="xs">
-                        <Table.Thead>
-                          <Table.Tr>
-                            <Table.Th>Date</Table.Th>
-                            <Table.Th>Home</Table.Th>
-                            <Table.Th>Swap</Table.Th>
-                            <Table.Th>Away</Table.Th>
-                            <Table.Th>Venue / time</Table.Th>
-                            <Table.Th>Actions</Table.Th>
-                          </Table.Tr>
-                        </Table.Thead>
-                        <Table.Tbody>
-                          {draftGames.map((game) => {
-                            const rowBusy = busyRow === game.id;
-                            return (
-                              <Table.Tr key={game.id}>
-                                <Table.Td>
-                                  <TextInput
-                                    type="date"
-                                    size="xs"
-                                    aria-label="Game date"
-                                    defaultValue={game.date.slice(0, 10)}
-                                    onBlur={(e) => {
-                                      const v = e.currentTarget.value;
-                                      if (v && v !== game.date.slice(0, 10)) changeDate(game, v);
-                                    }}
-                                    disabled={rowBusy}
-                                  />
-                                </Table.Td>
-                                <Table.Td miw={160}>
-                                  <TeamSelect
-                                    seasonId={seasonId}
-                                    value={game.homeTeamId}
-                                    onChange={(id) => changeTeam(game, 'home', id)}
-                                    label=""
-                                    disabled={rowBusy}
-                                  />
-                                </Table.Td>
-                                <Table.Td>
-                                  <Tooltip label="Swap home and away">
-                                    <ActionIcon
-                                      variant="light"
-                                      aria-label="Swap home and away"
-                                      onClick={() => swapTeams(game)}
-                                      disabled={rowBusy}
-                                    >
-                                      <span aria-hidden="true">&#8646;</span>
-                                    </ActionIcon>
-                                  </Tooltip>
-                                </Table.Td>
-                                <Table.Td miw={160}>
-                                  <TeamSelect
-                                    seasonId={seasonId}
-                                    value={game.awayTeamId}
-                                    onChange={(id) => changeTeam(game, 'away', id)}
-                                    label=""
-                                    disabled={rowBusy}
-                                  />
-                                </Table.Td>
-                                <Table.Td>
-                                  {game.venue && game.startTime
-                                    ? `${game.venue} @ ${game.startTime}`
-                                    : <Text c="dimmed" size="sm">unassigned</Text>}
-                                </Table.Td>
-                                <Table.Td>
-                                  <Button
-                                    size="xs"
-                                    variant="light"
-                                    onClick={() => void applyToOne(game)}
-                                    loading={rowBusy}
-                                  >
-                                    Apply default
-                                  </Button>
-                                </Table.Td>
-                              </Table.Tr>
-                            );
-                          })}
-                        </Table.Tbody>
-                      </Table>
-                    </Table.ScrollContainer>
-                  </Card>
-                ) : null}
-                <Text size="xs" c="dimmed">
-                  Draft games are hidden from the public schedule until you submit.
-                </Text>
+                ) : (
+                  <>
+                    <Text size="sm" c="dimmed">
+                      These games are visible to the public. You can still change the
+                      date, teams, and venue/time of a game that has not been played.
+                      Completed and cancelled games are read-only here.
+                    </Text>
+                    {renderEditableTable(officialGames)}
+                  </>
+                )}
               </Stack>
             </section>
           </>
         ) : (
-          <Text role="status" c="dimmed">Select a league and a season to generate a schedule.</Text>
+          <Text role="status" c="dimmed">Select a league and a season to view and edit its schedule.</Text>
         )}
       </Stack>
+
+      {/* Venue/time modal (routes to assign for drafts, reschedule for official). */}
+      <Modal opened={venueTarget !== null} onClose={closeVenue} title="Set venue and time">
+        <form onSubmit={handleVenueSave} noValidate>
+          <Stack gap="sm">
+            <Text size="sm" c="dimmed">
+              {venueTarget ? `${venueTarget.homeTeamName} vs ${venueTarget.awayTeamName}` : ''}
+            </Text>
+            <TextInput label="Venue" required data-autofocus {...venueForm.getInputProps('venue')} />
+            <TextInput label="Start time (HH:MM)" placeholder="18:00" required {...venueForm.getInputProps('startTime')} />
+            <NumberInput label="Duration (minutes)" min={1} max={480} allowDecimal={false} {...venueForm.getInputProps('durationMinutes')} />
+            <Group justify="flex-end">
+              <Button variant="default" type="button" onClick={closeVenue}>Cancel</Button>
+              <Button type="submit" loading={venueTarget !== null && busyRow === venueTarget.id}>Save</Button>
+            </Group>
+          </Stack>
+        </form>
+      </Modal>
     </section>
   );
-
-  function handleSubmit(): void {
-    if (seasonId === null) return;
-    setSubmitting(true);
-    scheduleApi
-      .submit(seasonId)
-      .then((res) => {
-        refresh();
-        notifications.show({
-          color: 'green',
-          title: 'Schedule submitted',
-          message: `${res.games.length} game(s) are now official.`,
-        });
-      })
-      .catch((err: unknown) => {
-        notifications.show({
-          color: 'red',
-          title: 'Could not submit',
-          message: messageFor(err, 'Failed to submit the schedule.'),
-        });
-      })
-      .finally(() => setSubmitting(false));
-  }
 }

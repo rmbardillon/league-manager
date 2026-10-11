@@ -421,9 +421,19 @@ export class AutomaticSchedulingService {
           gameId: command.gameId,
         });
       }
-      if (game.scheduleState !== 'draft') {
-        throw new ValidationError('Only a draft Game can be edited this way.', {
-          field: 'scheduleState',
+      // A played (completed) Game cannot be rewritten - changing its teams or
+      // date would invalidate the recorded Score, Standings, and Statistics.
+      // A cancelled Game is likewise not editable. Draft and official-but-
+      // still-scheduled Games may both be edited (date and matchup).
+      if (game.status === 'completed') {
+        throw new ValidationError(
+          'A completed Game cannot be edited; correct its score instead.',
+          { field: 'status', gameId: command.gameId },
+        );
+      }
+      if (game.status === 'cancelled') {
+        throw new ValidationError('A cancelled Game cannot be edited.', {
+          field: 'status',
           gameId: command.gameId,
         });
       }
