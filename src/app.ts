@@ -41,6 +41,7 @@ import { createScheduleRouter } from './api/routes/schedule.js';
 import { createAwardsRouter } from './api/routes/awards.js';
 import { createAuthRouter } from './api/routes/auth.js';
 import { createLeaguesRouter } from './api/routes/leagues.js';
+import { createGamesReadRouter } from './api/routes/gamesRead.js';
 
 export function createApp(): Express {
   const app = express();
@@ -78,6 +79,8 @@ export function createApp(): Express {
   app.use('/seasons', createBatchRouter());
   app.use('/playoff-rounds', createSeriesRouter());
   app.use('/scopes', createAwardsRouter());
+  // Management-side Game reads (list a Season's Games, read one Game).
+  app.use('/', createGamesReadRouter());
   // Automatic scheduling mounts its own /seasons/... and /games/... subpaths.
   app.use('/', createScheduleRouter());
 

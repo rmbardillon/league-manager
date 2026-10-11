@@ -31,7 +31,12 @@ import {
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 
-import { ApiError, playersApi, type Player } from '../../api/index.js';
+import {
+  ApiError,
+  playersApi,
+  type Player,
+  type PlayerHistoryEntry,
+} from '../../api/index.js';
 import { invalidate } from '../../api/resourceCache.js';
 import { useResourceList } from '../../hooks/useResourceList.js';
 import classes from './ManageHome.module.css';
@@ -65,6 +70,10 @@ export function PlayersRegistryPage(): JSX.Element {
   const [deleteTarget, setDeleteTarget] = useState<Player | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [historyTarget, setHistoryTarget] = useState<Player | null>(null);
+  const [history, setHistory] = useState<PlayerHistoryEntry[] | null>(null);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyError, setHistoryError] = useState<string | null>(null);
 
   const loader = useCallback(
     (signal: AbortSignal) => playersApi.listMasters(signal),
@@ -191,6 +200,27 @@ export function PlayersRegistryPage(): JSX.Element {
     }
   }, [deleteTarget, refresh, closeDelete]);
 
+  const openHistory = useCallback(async (player: Player) => {
+    setHistoryTarget(player);
+    setHistory(null);
+    setHistoryError(null);
+    setHistoryLoading(true);
+    try {
+      const entries = await playersApi.history(player.id);
+      setHistory(entries);
+    } catch (err: unknown) {
+      setHistoryError(err instanceof ApiError ? err.message : 'Failed to load history.');
+    } finally {
+      setHistoryLoading(false);
+    }
+  }, []);
+
+  const closeHistory = useCallback(() => {
+    setHistoryTarget(null);
+    setHistory(null);
+    setHistoryError(null);
+  }, []);
+
   const showEmptyState = useMemo(
     () => !loading && error === null && items.length === 0,
     [loading, error, items.length],
@@ -283,6 +313,13 @@ export function PlayersRegistryPage(): JSX.Element {
                               </Button>
                               <Button
                                 size="xs"
+                                variant="subtle"
+                                onClick={() => void openHistory(player)}
+                              >
+                                History
+                              </Button>
+                              <Button
+                                size="xs"
                                 variant="light"
                                 color="nba-red"
                                 onClick={() => openDelete(player)}
@@ -345,6 +382,47 @@ export function PlayersRegistryPage(): JSX.Element {
               Remove
             </Button>
           </Group>
+        </Stack>
+      </Modal>
+
+      {/* History modal. */}
+      <Modal
+        opened={historyTarget !== null}
+        onClose={closeHistory}
+        title={historyTarget ? `History: ${historyTarget.name}` : 'History'}
+      >
+        <Stack gap="sm">
+          {historyLoading ? <Text role="status">Loading history...</Text> : null}
+          {historyError !== null ? (
+            <Alert role="alert" color="nba-red" title="Could not load history">
+              {historyError}
+            </Alert>
+          ) : null}
+          {history !== null && history.length === 0 ? (
+            <Text role="status" c="dimmed">
+              This player has no team assignments yet.
+            </Text>
+          ) : null}
+          {history !== null && history.length > 0 ? (
+            <Table withTableBorder>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>Team</Table.Th>
+                  <Table.Th>Season</Table.Th>
+                  <Table.Th>Jersey</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {history.map((entry) => (
+                  <Table.Tr key={entry.assignmentId}>
+                    <Table.Td>{entry.teamId}</Table.Td>
+                    <Table.Td>{entry.seasonId}</Table.Td>
+                    <Table.Td>{entry.jerseyNumber}</Table.Td>
+                  </Table.Tr>
+                ))}
+              </Table.Tbody>
+            </Table>
+          ) : null}
         </Stack>
       </Modal>
     </section>

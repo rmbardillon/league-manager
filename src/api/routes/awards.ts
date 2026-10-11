@@ -20,9 +20,15 @@
  * _Requirements: 13.13_
  */
 import { Router } from 'express';
-import { authenticate, authorizeRequest, type ResourceResolver } from '../middleware/auth.js';
+import {
+  authenticate,
+  authorizeRequest,
+  authorizeRoleRequest,
+  type ResourceResolver,
+} from '../middleware/auth.js';
 import { db } from '../../db/client.js';
 import { AwardsService } from '../../services/awardsService.js';
+import { awardRepository } from '../../repositories/index.js';
 import { asyncHandler, param } from './helpers.js';
 
 /** Administrator-only resource for Awards administration. */
@@ -33,6 +39,18 @@ export function createAwardsRouter(): Router {
   const router = Router();
   const service = new AwardsService(db);
 
+  router.get(
+    '/:scopeId/awards',
+    authenticate(),
+    authorizeRoleRequest(['Administrator']),
+    asyncHandler(async (req, res) => {
+      // Administrator read of EVERY Award for a scope - both published and
+      // unpublished - so the UI can review computed Awards before publishing.
+      const scopeId = param(req.params.scopeId);
+      const awards = await awardRepository.listByScope(scopeId, db);
+      res.status(200).json({ scopeId, awards });
+    }),
+  );
   router.post(
     '/:scopeId/awards/compute',
     authenticate(),

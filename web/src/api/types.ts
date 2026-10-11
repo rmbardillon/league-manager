@@ -164,6 +164,14 @@ export interface CreatePlayerRequest {
   name: string;
 }
 
+/** One entry of a master Player's assignment history (GET /players/:id/history). */
+export interface PlayerHistoryEntry {
+  assignmentId: string;
+  teamId: string;
+  seasonId: string;
+  jerseyNumber: number;
+}
+
 /** `PATCH /players/:playerId` - rename a master Player. */
 export interface UpdatePlayerRequest {
   name: string;
@@ -362,4 +370,171 @@ export interface ApiErrorResponse {
     message: string;
     details?: unknown;
   };
+}
+
+// ---------------------------------------------------------------------------
+// Games (management reads + manual scheduling) - Req 5, 12
+// ---------------------------------------------------------------------------
+
+export type GameStatus = 'scheduled' | 'completed' | 'cancelled';
+export type ScheduleState = 'draft' | 'official';
+
+/** One Game of a Season for the management views (GET /seasons/:id/games). */
+export interface GameSummary {
+  id: string;
+  /** ISO date-time string. */
+  date: string;
+  startTime: string | null;
+  durationMinutes: number | null;
+  venue: string | null;
+  status: GameStatus;
+  scheduleState: ScheduleState;
+  homeTeamId: string;
+  homeTeamName: string;
+  awayTeamId: string;
+  awayTeamName: string;
+  playoffRoundId: string | null;
+  seriesId: string | null;
+  homeScore: number | null;
+  awayScore: number | null;
+}
+
+/** A single Game's full record (GET /games/:gameId). */
+export type GameDetail = GameSummary;
+
+/** `POST /games` - create a manual regular-season Game (Req 5.1). */
+export interface CreateGameRequest {
+  seasonId: string;
+  homeTeamId: string;
+  awayTeamId: string;
+  /** ISO date (YYYY-MM-DD). */
+  date: string;
+  /** "HH:MM" 24-hour local start time. */
+  startTime: string;
+  /** 1-480 minutes. */
+  durationMinutes: number;
+  venue: string;
+}
+
+/** `PATCH /games/:gameId` - reschedule a non-cancelled Game (Req 5.6). */
+export interface RescheduleGameRequest {
+  /** ISO date (YYYY-MM-DD). */
+  date: string;
+  startTime: string;
+  durationMinutes?: number;
+  venue?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Scores (record / correct / read) - Req 6
+// ---------------------------------------------------------------------------
+
+/** `POST /games/:gameId/score` and `/score/correct` - 0-999 integers. */
+export interface RecordScoreRequest {
+  homeScore: number;
+  awayScore: number;
+}
+
+/** The stored Score of a Game. */
+export interface ScorePayload {
+  gameId: string;
+  homeScore: number;
+  awayScore: number;
+  /** ISO timestamp. */
+  completedAt: string;
+}
+
+// ---------------------------------------------------------------------------
+// Automatic schedule generation - Req 12
+// ---------------------------------------------------------------------------
+
+export type PlayableDay =
+  | 'Monday'
+  | 'Tuesday'
+  | 'Wednesday'
+  | 'Thursday'
+  | 'Friday'
+  | 'Saturday'
+  | 'Sunday';
+
+/** `POST /seasons/:id/schedule/generate` and `/regenerate` (Req 12.2). */
+export interface GenerateScheduleRequest {
+  /** ISO date (YYYY-MM-DD). */
+  startDate: string;
+  /** ISO date (YYYY-MM-DD). */
+  endDate: string;
+  playableDays: PlayableDay[];
+  roundRobinKind: 'single' | 'double';
+  gamesPerDay: number;
+}
+
+/** `POST /games/:gameId/assign` - assign Venue + start time to a draft Game. */
+export interface AssignVenueTimeRequest {
+  venue: string;
+  startTime: string;
+  durationMinutes?: number;
+}
+
+// ---------------------------------------------------------------------------
+// Statistics - Req 8
+// ---------------------------------------------------------------------------
+
+export type StatisticType =
+  | 'Points'
+  | 'Assists'
+  | 'Rebounds'
+  | 'Steals'
+  | 'Blocks'
+  | 'Three_Pointers_Made';
+
+/** `POST /statistics` - record a Statistic value for a Player in a Game. */
+export interface RecordStatisticRequest {
+  playerId: string;
+  gameId: string;
+  type: StatisticType;
+  /** 0-999 non-negative integer. */
+  value: number;
+}
+
+/** The stored Statistic. */
+export interface StatisticPayload {
+  id: string;
+  playerId: string;
+  gameId: string;
+  type: StatisticType;
+  value: number;
+}
+
+/** One per-type total in a season stat line. */
+export interface StatTotal {
+  type: StatisticType;
+  total: number;
+}
+
+/** Per-Player or per-Team season statistic totals (GET reads). */
+export interface SeasonStatsPayload {
+  seasonId: string;
+  /** The player or team the totals belong to. */
+  subjectId: string;
+  totals: StatTotal[];
+}
+
+// ---------------------------------------------------------------------------
+// Awards (management compute/publish + admin read) - Req 13
+// ---------------------------------------------------------------------------
+
+/** Result of computing Awards for a scope (unpublished until published). */
+export interface ComputeAwardsResult {
+  awards: Award[];
+  /** False when no regular-season Statistics exist for the scope (Req 13.16). */
+  regularSeasonAvailable: boolean;
+  /** False when the scope has no completed Finals Games (Req 13.12). */
+  finalsMvpAvailable: boolean;
+}
+
+/** Admin read of a scope's Awards (both published and unpublished). */
+export interface ScopeAwardsPayload {
+  scopeId: string;
+  awards: Award[];
+  message?: string;
 }

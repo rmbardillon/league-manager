@@ -43,6 +43,10 @@ import { SeasonsPage } from './pages/manage/SeasonsPage.js';
 import { TournamentsPage } from './pages/manage/TournamentsPage.js';
 import { PlayoffsPage } from './pages/manage/PlayoffsPage.js';
 import { BatchUploadPage } from './pages/manage/BatchUploadPage.js';
+import { GamesPage } from './pages/manage/GamesPage.js';
+import { SchedulePage as ManageSchedulePage } from './pages/manage/SchedulePage.js';
+import { StatisticsPage } from './pages/manage/StatisticsPage.js';
+import { AwardsPage as ManageAwardsPage } from './pages/manage/AwardsPage.js';
 
 /** The route table, router-agnostic so it can be mounted in tests. */
 export function AppRoutes(): JSX.Element {
@@ -116,6 +120,38 @@ export function AppRoutes(): JSX.Element {
           element={
             <ProtectedRoute requireAdmin>
               <BatchUploadPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="manage/games"
+          element={
+            <ProtectedRoute requireAdmin>
+              <GamesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="manage/schedule"
+          element={
+            <ProtectedRoute requireAdmin>
+              <ManageSchedulePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="manage/statistics"
+          element={
+            <ProtectedRoute requireAdmin>
+              <StatisticsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="manage/awards"
+          element={
+            <ProtectedRoute requireAdmin>
+              <ManageAwardsPage />
             </ProtectedRoute>
           }
         />

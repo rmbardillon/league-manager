@@ -23,8 +23,22 @@
 import { request } from './client.js';
 import type {
   AssignPlayerRequest,
+  AssignVenueTimeRequest,
+  Award,
+  ComputeAwardsResult,
   BatchUploadRequest,
   BatchUploadResult,
+  CreateGameRequest,
+  GameDetail,
+  GameSummary,
+  GenerateScheduleRequest,
+  RecordScoreRequest,
+  RescheduleGameRequest,
+  RecordStatisticRequest,
+  ScorePayload,
+  ScopeAwardsPayload,
+  SeasonStatsPayload,
+  StatisticPayload,
   AuthUser,
   CreatePlayerRequest,
   UpdatePlayerRequest,
@@ -36,6 +50,7 @@ import type {
   CreateTournamentRequest,
   LeagueSummary,
   Player,
+  PlayerHistoryEntry,
   PlayoffRoundSummary,
   PublicSeasonsPayload,
   PublishedAwardsPayload,
@@ -271,6 +286,11 @@ export const playersApi = {
   remove(playerId: string): Promise<void> {
     return request<void>(`/players/${encodeURIComponent(playerId)}`, { method: 'DELETE' });
   },
+
+  /** A master Player's team/season/jersey assignment history (Req 4.3). */
+  history(playerId: string, signal?: AbortSignal): Promise<PlayerHistoryEntry[]> {
+    return request<PlayerHistoryEntry[]>(`/players/${encodeURIComponent(playerId)}/history`, { signal });
+  },
 };
 
 /** Team roster and assignment management (Req 6.5, 6.8, 6.9). */
@@ -319,6 +339,162 @@ export const batchApi = {
     return request<BatchUploadResult>(
       `/seasons/${encodeURIComponent(seasonId)}/batch-upload`,
       { method: 'POST', body: input },
+    );
+  },
+};
+
+/** Management-side Game reads + manual scheduling (Req 5). */
+export const gamesApi = {
+  /** List every Game of a Season (all states), with team names + score. */
+  list(seasonId: string, signal?: AbortSignal): Promise<GameSummary[]> {
+    return request<GameSummary[]>(
+      `/seasons/${encodeURIComponent(seasonId)}/games`,
+      { signal },
+    );
+  },
+
+  /** Read a single Game's full record. */
+  get(gameId: string, signal?: AbortSignal): Promise<GameDetail> {
+    return request<GameDetail>(`/games/${encodeURIComponent(gameId)}`, { signal });
+  },
+
+  /** Create a manual regular-season Game (Req 5.1). */
+  create(input: CreateGameRequest): Promise<GameSummary> {
+    return request<GameSummary>('/games', { method: 'POST', body: input });
+  },
+
+  /** Reschedule a non-cancelled Game (Req 5.6). */
+  reschedule(gameId: string, input: RescheduleGameRequest): Promise<GameSummary> {
+    return request<GameSummary>(`/games/${encodeURIComponent(gameId)}`, {
+      method: 'PATCH',
+      body: input,
+    });
+  },
+
+  /** Cancel a Game, retaining the record (Req 5.8). */
+  cancel(gameId: string): Promise<GameSummary> {
+    return request<GameSummary>(
+      `/games/${encodeURIComponent(gameId)}/cancel`,
+      { method: 'POST' },
+    );
+  },
+};
+
+/** Score recording / correction (Req 6). */
+export const scoresApi = {
+  /** Record the initial Score and mark the Game completed (Req 6.1). */
+  record(gameId: string, input: RecordScoreRequest): Promise<ScorePayload> {
+    return request<ScorePayload>(
+      `/games/${encodeURIComponent(gameId)}/score`,
+      { method: 'POST', body: input },
+    );
+  },
+
+  /** Correct the Score of a completed Game (Req 6.4). */
+  correct(gameId: string, input: RecordScoreRequest): Promise<ScorePayload> {
+    return request<ScorePayload>(
+      `/games/${encodeURIComponent(gameId)}/score/correct`,
+      { method: 'POST', body: input },
+    );
+  },
+};
+
+/** Automatic schedule generation - draft-then-submit workflow (Req 12). */
+export const scheduleApi = {
+  /** Generate a Draft_Schedule for a Season (Req 12.2). */
+  generate(
+    seasonId: string,
+    input: GenerateScheduleRequest,
+  ): Promise<{ games: GameSummary[] }> {
+    return request<{ games: GameSummary[] }>(
+      `/seasons/${encodeURIComponent(seasonId)}/schedule/generate`,
+      { method: 'POST', body: input },
+    );
+  },
+
+  /** Discard the draft and regenerate it (Req 12.16). */
+  regenerate(
+    seasonId: string,
+    input: GenerateScheduleRequest,
+  ): Promise<{ games: GameSummary[] }> {
+    return request<{ games: GameSummary[] }>(
+      `/seasons/${encodeURIComponent(seasonId)}/schedule/regenerate`,
+      { method: 'POST', body: input },
+    );
+  },
+
+  /** Assign a Venue + start time to a draft Game (Req 12.11). */
+  assign(gameId: string, input: AssignVenueTimeRequest): Promise<GameSummary> {
+    return request<GameSummary>(
+      `/games/${encodeURIComponent(gameId)}/assign`,
+      { method: 'POST', body: input },
+    );
+  },
+
+  /** Submit the draft so it becomes official/visible (Req 12.17). */
+  submit(seasonId: string): Promise<{ games: GameSummary[] }> {
+    return request<{ games: GameSummary[] }>(
+      `/seasons/${encodeURIComponent(seasonId)}/schedule/submit`,
+      { method: 'POST' },
+    );
+  },
+};
+
+/** Statistics recording and season-total reads (Req 8). */
+export const statisticsApi = {
+  /** Record a Statistic value for a Player in a Game (Req 8.2). */
+  record(input: RecordStatisticRequest): Promise<StatisticPayload> {
+    return request<StatisticPayload>('/statistics', { method: 'POST', body: input });
+  },
+
+  /** Per-type season totals for a Player (Req 8.6, 8.7). */
+  playerSeason(
+    seasonId: string,
+    playerId: string,
+    signal?: AbortSignal,
+  ): Promise<SeasonStatsPayload> {
+    return request<SeasonStatsPayload>(
+      `/statistics/seasons/${encodeURIComponent(seasonId)}/players/${encodeURIComponent(playerId)}`,
+      { signal },
+    );
+  },
+
+  /** Per-type season totals for a Team (Req 8.8). */
+  teamSeason(
+    seasonId: string,
+    teamId: string,
+    signal?: AbortSignal,
+  ): Promise<SeasonStatsPayload> {
+    return request<SeasonStatsPayload>(
+      `/statistics/seasons/${encodeURIComponent(seasonId)}/teams/${encodeURIComponent(teamId)}`,
+      { signal },
+    );
+  },
+};
+
+/** Awards: admin read (all), compute, and publish (Req 13). */
+export const awardsApi = {
+  /** Read EVERY Award for a scope (published + unpublished) - admin review. */
+  adminList(scopeId: string, signal?: AbortSignal): Promise<ScopeAwardsPayload> {
+    return request<ScopeAwardsPayload>(
+      `/scopes/${encodeURIComponent(scopeId)}/awards`,
+      { signal },
+    );
+  },
+
+  /** Compute and persist Awards as unpublished (Req 13.13-13.16). */
+  compute(scopeId: string): Promise<ComputeAwardsResult> {
+    return request<ComputeAwardsResult>(
+      `/scopes/${encodeURIComponent(scopeId)}/awards/compute`,
+      { method: 'POST' },
+    );
+  },
+
+  /** Publish the scope's Awards so Viewers can see them (Req 13.13). */
+  publish(scopeId: string): Promise<{ awards: Award[] }> {
+    return request<{ awards: Award[] }>(
+      `/scopes/${encodeURIComponent(scopeId)}/awards/publish`,
+      { method: 'POST' },
     );
   },
 };

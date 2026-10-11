@@ -16,5 +16,10 @@ export {
   playersApi,
   assignmentsApi,
   batchApi,
+  gamesApi,
+  scoresApi,
+  scheduleApi,
+  statisticsApi,
+  awardsApi,
 } from './endpoints.js';
 export type * from './types.js';
